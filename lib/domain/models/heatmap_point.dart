@@ -1,13 +1,16 @@
-class HeatmapPoint {
-  final double lat;
-  final double lng;
-  final double intensity;
-  final double depthCm;
 
-  const HeatmapPoint({
-    required this.lat,
-    required this.lng,
-    required this.intensity,
-    required this.depthCm,
-  });
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'heatmap_point.freezed.dart';
+
+@freezed
+abstract class HeatmapPoint with _$HeatmapPoint {
+
+  const factory HeatmapPoint({
+    required double lat,
+    required double lng,
+    required double intensity,
+    required double depthCm,
+  }) = _HeatmapPoint;
 }

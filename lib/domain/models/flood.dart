@@ -5,26 +5,22 @@ import 'package:bantay_baha/domain/models/metrics.dart';
 import 'package:bantay_baha/domain/models/road.dart';
 import 'package:bantay_baha/domain/models/station.dart';
 import 'package:bantay_baha/domain/models/weather.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class Flood {
-  final bool success;
-  final DateTime calculatedAt;
-  final DateTime scrapedAt;
-  final Metrics metrics;
-  final List<Station> stations;
-  final List<Road> roads;
-  final List<HeatmapPoint> heatmapPoints;
-  final Weather weather;
+part 'flood.freezed.dart';
 
-  const Flood({
-    required this.success,
-    required this.calculatedAt,
-    required this.scrapedAt,
-    required this.metrics,
-    required this.stations,
-    required this.roads,
-    required this.heatmapPoints,
-    required this.weather,
-  });
+@freezed
+abstract class Flood with _$Flood {
+
+  const factory Flood({
+    required bool success,
+    required DateTime calculatedAt,
+    required DateTime scrapedAt,
+    required Metrics metrics,
+    required List<Station> stations,
+    required List<Road> roads,
+    required List<HeatmapPoint> heatmapPoints,
+    required Weather weather,
+  }) = _Flood;
 
 }

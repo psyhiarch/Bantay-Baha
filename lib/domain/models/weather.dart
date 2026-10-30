@@ -1,15 +1,19 @@
-class Weather {
-  final double metroManilaRainMmHr;
-  final double metroManilaRain24hMm;
-  final double forecast3hTotalMm;
-  final String trend;
-  final String conditionLabel;
 
-  const Weather({
-    required this.metroManilaRainMmHr,
-    required this.metroManilaRain24hMm,
-    required this.forecast3hTotalMm,
-    required this.trend,
-    required this.conditionLabel,
-  });
+
+
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'weather.freezed.dart';
+
+@freezed
+abstract class Weather with _$Weather {
+
+
+  const factory Weather({
+  required double metroManilaRainMmHr,
+  required double metroManilaRain24hMm,
+  required double forecast3hTotalMm,
+  required String trend,
+  required String conditionLabel,
+  }) = _Weather;
 }

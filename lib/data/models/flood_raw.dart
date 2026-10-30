@@ -1,35 +1,22 @@
-class FloodRaw {
-  final bool success;
-  final String calculatedAt;
-  final String scrapedAt;
-  final Map<String, dynamic> metrics;
-  final List<Map<String, dynamic>> stations;
-  final List<Map<String, dynamic>> roads;
-  final List<Map<String, dynamic>> heatmapPoints;
-  final Map<String, dynamic> weather;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const FloodRaw({
-    required this.success,
-    required this.calculatedAt,
-    required this.scrapedAt,
-    required this.metrics,
-    required this.stations,
-    required this.roads,
-    required this.heatmapPoints,
-    required this.weather,
-  });
+part 'flood_raw.freezed.dart';
 
-  factory FloodRaw.fromJson(Map<String, dynamic> json) {
-    return FloodRaw(
-      success: json['success'],
-      calculatedAt: json['calculatedAt'],
-      scrapedAt: json['scrapedAt'],
-      metrics: json['metrics'],
-      stations: json['stations'],
-      roads: json['roads'],
-      heatmapPoints: json['heatmapPoints'],
-      weather: json['weather'],
-    );
-  }
+part 'flood_raw.g.dart';
 
+@freezed
+abstract class FloodRaw with _$FloodRaw {
+  const factory FloodRaw({
+    required bool success,
+    required String calculatedAt,
+    required String scrapedAt,
+    required Map<String, dynamic> metrics,
+    required List<Map<String, dynamic>> stations,
+    required List<Map<String, dynamic>> roads,
+    required List<Map<String, dynamic>> heatmapPoints,
+    required Map<String, dynamic> weather,
+  }) = _FloodRaw;
+
+  factory FloodRaw.fromJson(Map<String, Object?> json) =>
+      _$FloodRawFromJson(json);
 }

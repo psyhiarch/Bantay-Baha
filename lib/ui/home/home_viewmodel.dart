@@ -1,10 +1,11 @@
 
 
-import 'package:bantay_baha/data/repositories/flood_repository.dart';
+import 'package:bantay_baha/data/repositories/flood_repository_impl.dart';
 import 'package:bantay_baha/domain/models/flood.dart';
+import 'package:bantay_baha/domain/repositories/flood_repository.dart';
 import 'package:flutter/material.dart';
 
-class HomeViewModel{
+class HomeViewModel {
 
   final FloodRepository _floodRepository;
 
@@ -12,3 +13,4 @@ class HomeViewModel{
 
   
 }
+
