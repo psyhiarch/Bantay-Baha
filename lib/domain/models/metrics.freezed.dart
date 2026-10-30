@@ -12,6 +12,7 @@ part of 'metrics.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$Metrics {
 
@@ -22,6 +23,8 @@ mixin _$Metrics {
 @pragma('vm:prefer-inline')
 $MetricsCopyWith<Metrics> get copyWith => _$MetricsCopyWithImpl<Metrics>(this as Metrics, _$identity);
 
+  /// Serializes this Metrics to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -30,7 +33,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Metrics&&(identical(other.totalStations, _this.totalStations) || other.totalStations == _this.totalStations)&&(identical(other.highRiskStationsCount, _this.highRiskStationsCount) || other.highRiskStationsCount == _this.highRiskStationsCount)&&(identical(other.peakWaterLevel, _this.peakWaterLevel) || other.peakWaterLevel == _this.peakWaterLevel)&&(identical(other.peakWaterStation, _this.peakWaterStation) || other.peakWaterStation == _this.peakWaterStation)&&(identical(other.maxRain1h, _this.maxRain1h) || other.maxRain1h == _this.maxRain1h)&&(identical(other.maxRain24h, _this.maxRain24h) || other.maxRain24h == _this.maxRain24h));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Metrics;
@@ -214,11 +217,11 @@ return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterL
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _Metrics implements Metrics {
   const _Metrics({required this.totalStations, required this.highRiskStationsCount, required this.peakWaterLevel, required this.peakWaterStation, required this.maxRain1h, required this.maxRain24h});
-  
+  factory _Metrics.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
 
 @override final  int totalStations;
 @override final  int highRiskStationsCount;
@@ -233,14 +236,17 @@ class _Metrics implements Metrics {
 @pragma('vm:prefer-inline')
 _$MetricsCopyWith<_Metrics> get copyWith => __$MetricsCopyWithImpl<_Metrics>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$MetricsToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Metrics&&(identical(other.totalStations, totalStations) || other.totalStations == totalStations)&&(identical(other.highRiskStationsCount, highRiskStationsCount) || other.highRiskStationsCount == highRiskStationsCount)&&(identical(other.peakWaterLevel, peakWaterLevel) || other.peakWaterLevel == peakWaterLevel)&&(identical(other.peakWaterStation, peakWaterStation) || other.peakWaterStation == peakWaterStation)&&(identical(other.maxRain1h, maxRain1h) || other.maxRain1h == maxRain1h)&&(identical(other.maxRain24h, maxRain24h) || other.maxRain24h == maxRain24h));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hash(runtimeType,totalStations,highRiskStationsCount,peakWaterLevel,peakWaterStation,maxRain1h,maxRain24h);

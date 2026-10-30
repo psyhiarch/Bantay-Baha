@@ -3,6 +3,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'metrics.freezed.dart';
 
+part 'metrics.g.dart';
+
 @freezed
 abstract class Metrics with _$Metrics{
 
@@ -14,4 +16,6 @@ abstract class Metrics with _$Metrics{
     required double maxRain1h,
     required double maxRain24h,
   }) = _Metrics;
+
+  factory Metrics.fromJson(Map<String, Object?> json) => _$MetricsFromJson(json);
 }

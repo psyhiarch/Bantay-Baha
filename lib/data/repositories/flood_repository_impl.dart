@@ -9,11 +9,12 @@ class FloodRepositoryImpl implements FloodRepository {
 
   final FloodApiService _floodApiService;
 
-  const FloodRepositoryImpl({required this._floodApiService});
+  const FloodRepositoryImpl(this._floodApiService);
 
   @override
-  Future<Flood> getFloodLive() async {
-    return await _floodApiService.fetchFloodLive();
+  Future<Flood?> getFloodLive() async {
+    final FloodRaw floodRaw = await _floodApiService.fetchFloodLive();
+    return null;
   }
 
 

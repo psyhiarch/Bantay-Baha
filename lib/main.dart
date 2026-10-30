@@ -1,16 +1,31 @@
-import 'package:bantay_baha/data/repositories/flood_repository_impl.dart';
-import 'package:bantay_baha/data/services/flood_api_service.dart';
-import 'package:bantay_baha/dependency_provider.dart';
+import 'package:bantay_baha/app/locator.dart';
+import 'package:bantay_baha/shell_scaffold.dart';
 import 'package:bantay_baha/ui/home/home_view.dart';
+import 'package:bantay_baha/ui/home/home_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:provider/provider.dart';
+
+GoRouter _goRouter = GoRouter(
+  routes: [
+    ShellRoute(
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => const HomeView()),
+      ],
+      builder: (context, state, child) => ShellScaffold(child: child),
+    ),
+  ],
+);
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   MapLibreMap.preWarm();
+  setupLocator();
   runApp(
-    RepositoryProvider(
-      floodRepository: FloodRepositoryImpl(floodApiService: FloodApiService()),
-      child: MaterialApp(home: HomeView()),
+    MultiProvider(
+      providers: [ChangeNotifierProvider.value(value: getIt<HomeViewModel>())],
+      child: MaterialApp.router(routerConfig: _goRouter),
     ),
   );
 }
