@@ -12,7 +12,6 @@ part of 'station.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$Station {
 
@@ -23,8 +22,6 @@ mixin _$Station {
 @pragma('vm:prefer-inline')
 $StationCopyWith<Station> get copyWith => _$StationCopyWithImpl<Station>(this as Station, _$identity);
 
-  /// Serializes this Station to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -33,7 +30,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Station&&(identical(other.stationId, _this.stationId) || other.stationId == _this.stationId)&&(identical(other.stationName, _this.stationName) || other.stationName == _this.stationName)&&(identical(other.latitude, _this.latitude) || other.latitude == _this.latitude)&&(identical(other.longitude, _this.longitude) || other.longitude == _this.longitude)&&(identical(other.geohash, _this.geohash) || other.geohash == _this.geohash)&&(identical(other.rain10m, _this.rain10m) || other.rain10m == _this.rain10m)&&(identical(other.rain1h, _this.rain1h) || other.rain1h == _this.rain1h)&&(identical(other.rain24h, _this.rain24h) || other.rain24h == _this.rain24h)&&(identical(other.waterLevel, _this.waterLevel) || other.waterLevel == _this.waterLevel)&&(identical(other.waterLevelDelta1h, _this.waterLevelDelta1h) || other.waterLevelDelta1h == _this.waterLevelDelta1h)&&(identical(other.waterRiskLevel, _this.waterRiskLevel) || other.waterRiskLevel == _this.waterRiskLevel)&&(identical(other.rainRiskLevel, _this.rainRiskLevel) || other.rainRiskLevel == _this.rainRiskLevel)&&(identical(other.riskLevel, _this.riskLevel) || other.riskLevel == _this.riskLevel)&&(identical(other.lastUpdated, _this.lastUpdated) || other.lastUpdated == _this.lastUpdated));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as Station;
@@ -225,11 +222,11 @@ return $default(_that.stationId,_that.stationName,_that.latitude,_that.longitude
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _Station implements Station {
   const _Station({required this.stationId, required this.stationName, required this.latitude, required this.longitude, required this.geohash, required this.rain10m, required this.rain1h, required this.rain24h, required this.waterLevel, required this.waterLevelDelta1h, required this.waterRiskLevel, required this.rainRiskLevel, required this.riskLevel, required this.lastUpdated});
-  factory _Station.fromJson(Map<String, dynamic> json) => _$StationFromJson(json);
+  
 
 @override final  String stationId;
 @override final  String stationName;
@@ -252,17 +249,14 @@ class _Station implements Station {
 @pragma('vm:prefer-inline')
 _$StationCopyWith<_Station> get copyWith => __$StationCopyWithImpl<_Station>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$StationToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Station&&(identical(other.stationId, stationId) || other.stationId == stationId)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.geohash, geohash) || other.geohash == geohash)&&(identical(other.rain10m, rain10m) || other.rain10m == rain10m)&&(identical(other.rain1h, rain1h) || other.rain1h == rain1h)&&(identical(other.rain24h, rain24h) || other.rain24h == rain24h)&&(identical(other.waterLevel, waterLevel) || other.waterLevel == waterLevel)&&(identical(other.waterLevelDelta1h, waterLevelDelta1h) || other.waterLevelDelta1h == waterLevelDelta1h)&&(identical(other.waterRiskLevel, waterRiskLevel) || other.waterRiskLevel == waterRiskLevel)&&(identical(other.rainRiskLevel, rainRiskLevel) || other.rainRiskLevel == rainRiskLevel)&&(identical(other.riskLevel, riskLevel) || other.riskLevel == riskLevel)&&(identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,stationId,stationName,latitude,longitude,geohash,rain10m,rain1h,rain24h,waterLevel,waterLevelDelta1h,waterRiskLevel,rainRiskLevel,riskLevel,lastUpdated);

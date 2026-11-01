@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'road.dart';
+part of 'road_raw.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Road _$RoadFromJson(Map<String, dynamic> json) => _Road(
+_RoadRaw _$RoadRawFromJson(Map<String, dynamic> json) => _RoadRaw(
   roadId: json['roadId'] as String,
   roadName: json['roadName'] as String,
   coordinates: (json['coordinates'] as List<dynamic>)
@@ -38,7 +38,7 @@ _Road _$RoadFromJson(Map<String, dynamic> json) => _Road(
   description: json['description'] as String,
 );
 
-Map<String, dynamic> _$RoadToJson(_Road instance) => <String, dynamic>{
+Map<String, dynamic> _$RoadRawToJson(_RoadRaw instance) => <String, dynamic>{
   'roadId': instance.roadId,
   'roadName': instance.roadName,
   'coordinates': instance.coordinates,

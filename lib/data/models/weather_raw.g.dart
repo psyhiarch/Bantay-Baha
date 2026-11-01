@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'weather.dart';
+part of 'weather_raw.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Weather _$WeatherFromJson(Map<String, dynamic> json) => _Weather(
+_WeatherRaw _$WeatherRawFromJson(Map<String, dynamic> json) => _WeatherRaw(
   metroManilaRainMmHr: (json['metroManilaRainMmHr'] as num).toDouble(),
   metroManilaRain24hMm: (json['metroManilaRain24hMm'] as num).toDouble(),
   forecast3hTotalMm: (json['forecast3hTotalMm'] as num).toDouble(),
@@ -14,10 +14,11 @@ _Weather _$WeatherFromJson(Map<String, dynamic> json) => _Weather(
   conditionLabel: json['conditionLabel'] as String,
 );
 
-Map<String, dynamic> _$WeatherToJson(_Weather instance) => <String, dynamic>{
-  'metroManilaRainMmHr': instance.metroManilaRainMmHr,
-  'metroManilaRain24hMm': instance.metroManilaRain24hMm,
-  'forecast3hTotalMm': instance.forecast3hTotalMm,
-  'trend': instance.trend,
-  'conditionLabel': instance.conditionLabel,
-};
+Map<String, dynamic> _$WeatherRawToJson(_WeatherRaw instance) =>
+    <String, dynamic>{
+      'metroManilaRainMmHr': instance.metroManilaRainMmHr,
+      'metroManilaRain24hMm': instance.metroManilaRain24hMm,
+      'forecast3hTotalMm': instance.forecast3hTotalMm,
+      'trend': instance.trend,
+      'conditionLabel': instance.conditionLabel,
+    };

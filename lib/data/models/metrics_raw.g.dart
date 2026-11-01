@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'metrics.dart';
+part of 'metrics_raw.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Metrics _$MetricsFromJson(Map<String, dynamic> json) => _Metrics(
+_MetricsRaw _$MetricsRawFromJson(Map<String, dynamic> json) => _MetricsRaw(
   totalStations: (json['totalStations'] as num).toInt(),
   highRiskStationsCount: (json['highRiskStationsCount'] as num).toInt(),
   peakWaterLevel: (json['peakWaterLevel'] as num).toDouble(),
@@ -20,16 +20,17 @@ _Metrics _$MetricsFromJson(Map<String, dynamic> json) => _Metrics(
   maxRain24hStationId: json['maxRain24hStationId'] as String,
 );
 
-Map<String, dynamic> _$MetricsToJson(_Metrics instance) => <String, dynamic>{
-  'totalStations': instance.totalStations,
-  'highRiskStationsCount': instance.highRiskStationsCount,
-  'peakWaterLevel': instance.peakWaterLevel,
-  'peakWaterStation': instance.peakWaterStation,
-  'peakWaterStationId': instance.peakWaterStationId,
-  'maxRain1h': instance.maxRain1h,
-  'maxRain1hStation': instance.maxRain1hStation,
-  'maxRain1hStationId': instance.maxRain1hStationId,
-  'maxRain24h': instance.maxRain24h,
-  'maxRain24hStation': instance.maxRain24hStation,
-  'maxRain24hStationId': instance.maxRain24hStationId,
-};
+Map<String, dynamic> _$MetricsRawToJson(_MetricsRaw instance) =>
+    <String, dynamic>{
+      'totalStations': instance.totalStations,
+      'highRiskStationsCount': instance.highRiskStationsCount,
+      'peakWaterLevel': instance.peakWaterLevel,
+      'peakWaterStation': instance.peakWaterStation,
+      'peakWaterStationId': instance.peakWaterStationId,
+      'maxRain1h': instance.maxRain1h,
+      'maxRain1hStation': instance.maxRain1hStation,
+      'maxRain1hStationId': instance.maxRain1hStationId,
+      'maxRain24h': instance.maxRain24h,
+      'maxRain24hStation': instance.maxRain24hStation,
+      'maxRain24hStationId': instance.maxRain24hStationId,
+    };

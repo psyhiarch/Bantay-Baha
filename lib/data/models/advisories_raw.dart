@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'advisories_raw.freezed.dart';
+part 'advisories_raw.g.dart';
 
 @freezed
 abstract class AdvisoriesRaw with _$AdvisoriesRaw {
@@ -12,4 +13,6 @@ abstract class AdvisoriesRaw with _$AdvisoriesRaw {
     required int? activeFloodCount,
     required Map<String, dynamic>? meta,
   }) = _AdvisoriesRaw;
+
+  factory AdvisoriesRaw.fromJson(Map<String, dynamic> json) => _$AdvisoriesRawFromJson(json);
 }

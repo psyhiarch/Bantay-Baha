@@ -3,8 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'metrics.freezed.dart';
 
-part 'metrics.g.dart';
-
 @freezed
 abstract class Metrics with _$Metrics{
 
@@ -22,5 +20,4 @@ abstract class Metrics with _$Metrics{
     required String maxRain24hStationId,
   }) = _Metrics;
 
-  factory Metrics.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
 }

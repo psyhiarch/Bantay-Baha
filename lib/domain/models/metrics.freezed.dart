@@ -12,7 +12,6 @@ part of 'metrics.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$Metrics {
 
@@ -23,8 +22,6 @@ mixin _$Metrics {
 @pragma('vm:prefer-inline')
 $MetricsCopyWith<Metrics> get copyWith => _$MetricsCopyWithImpl<Metrics>(this as Metrics, _$identity);
 
-  /// Serializes this Metrics to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -33,7 +30,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Metrics&&(identical(other.totalStations, _this.totalStations) || other.totalStations == _this.totalStations)&&(identical(other.highRiskStationsCount, _this.highRiskStationsCount) || other.highRiskStationsCount == _this.highRiskStationsCount)&&(identical(other.peakWaterLevel, _this.peakWaterLevel) || other.peakWaterLevel == _this.peakWaterLevel)&&(identical(other.peakWaterStation, _this.peakWaterStation) || other.peakWaterStation == _this.peakWaterStation)&&(identical(other.peakWaterStationId, _this.peakWaterStationId) || other.peakWaterStationId == _this.peakWaterStationId)&&(identical(other.maxRain1h, _this.maxRain1h) || other.maxRain1h == _this.maxRain1h)&&(identical(other.maxRain1hStation, _this.maxRain1hStation) || other.maxRain1hStation == _this.maxRain1hStation)&&(identical(other.maxRain1hStationId, _this.maxRain1hStationId) || other.maxRain1hStationId == _this.maxRain1hStationId)&&(identical(other.maxRain24h, _this.maxRain24h) || other.maxRain24h == _this.maxRain24h)&&(identical(other.maxRain24hStation, _this.maxRain24hStation) || other.maxRain24hStation == _this.maxRain24hStation)&&(identical(other.maxRain24hStationId, _this.maxRain24hStationId) || other.maxRain24hStationId == _this.maxRain24hStationId));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as Metrics;
@@ -222,11 +219,11 @@ return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterL
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _Metrics implements Metrics {
   const _Metrics({required this.totalStations, required this.highRiskStationsCount, required this.peakWaterLevel, required this.peakWaterStation, required this.peakWaterStationId, required this.maxRain1h, required this.maxRain1hStation, required this.maxRain1hStationId, required this.maxRain24h, required this.maxRain24hStation, required this.maxRain24hStationId});
-  factory _Metrics.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
+  
 
 @override final  int totalStations;
 @override final  int highRiskStationsCount;
@@ -246,17 +243,14 @@ class _Metrics implements Metrics {
 @pragma('vm:prefer-inline')
 _$MetricsCopyWith<_Metrics> get copyWith => __$MetricsCopyWithImpl<_Metrics>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$MetricsToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Metrics&&(identical(other.totalStations, totalStations) || other.totalStations == totalStations)&&(identical(other.highRiskStationsCount, highRiskStationsCount) || other.highRiskStationsCount == highRiskStationsCount)&&(identical(other.peakWaterLevel, peakWaterLevel) || other.peakWaterLevel == peakWaterLevel)&&(identical(other.peakWaterStation, peakWaterStation) || other.peakWaterStation == peakWaterStation)&&(identical(other.peakWaterStationId, peakWaterStationId) || other.peakWaterStationId == peakWaterStationId)&&(identical(other.maxRain1h, maxRain1h) || other.maxRain1h == maxRain1h)&&(identical(other.maxRain1hStation, maxRain1hStation) || other.maxRain1hStation == maxRain1hStation)&&(identical(other.maxRain1hStationId, maxRain1hStationId) || other.maxRain1hStationId == maxRain1hStationId)&&(identical(other.maxRain24h, maxRain24h) || other.maxRain24h == maxRain24h)&&(identical(other.maxRain24hStation, maxRain24hStation) || other.maxRain24hStation == maxRain24hStation)&&(identical(other.maxRain24hStationId, maxRain24hStationId) || other.maxRain24hStationId == maxRain24hStationId));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,totalStations,highRiskStationsCount,peakWaterLevel,peakWaterStation,peakWaterStationId,maxRain1h,maxRain1hStation,maxRain1hStationId,maxRain24h,maxRain24hStation,maxRain24hStationId);

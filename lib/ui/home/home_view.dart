@@ -13,6 +13,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
@@ -28,6 +29,9 @@ class _HomeViewState extends State<HomeView> {
     return Consumer<HomeViewModel>(
       builder: (context, viewModel, child) {
         final stations = viewModel.stations;
+        if (viewModel.isLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
         return RefreshIndicator(
           onRefresh: viewModel.init,
           child: ListView.builder(

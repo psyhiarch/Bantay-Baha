@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'heatmap_point.dart';
+part of 'heatmap_point_raw.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_HeatmapPoint _$HeatmapPointFromJson(Map<String, dynamic> json) =>
-    _HeatmapPoint(
+_HeatmapPointRaw _$HeatmapPointRawFromJson(Map<String, dynamic> json) =>
+    _HeatmapPointRaw(
       lat: (json['lat'] as num).toDouble(),
       lng: (json['lng'] as num).toDouble(),
       intensity: (json['intensity'] as num).toDouble(),
@@ -17,7 +17,7 @@ _HeatmapPoint _$HeatmapPointFromJson(Map<String, dynamic> json) =>
       isFlooded: json['isFlooded'] as bool,
     );
 
-Map<String, dynamic> _$HeatmapPointToJson(_HeatmapPoint instance) =>
+Map<String, dynamic> _$HeatmapPointRawToJson(_HeatmapPointRaw instance) =>
     <String, dynamic>{
       'lat': instance.lat,
       'lng': instance.lng,

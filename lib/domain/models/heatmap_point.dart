@@ -3,7 +3,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'heatmap_point.freezed.dart';
-part 'heatmap_point.g.dart';
+
 
 @freezed
 abstract class HeatmapPoint with _$HeatmapPoint {
@@ -18,5 +18,4 @@ abstract class HeatmapPoint with _$HeatmapPoint {
     required bool isFlooded,
   }) = _HeatmapPoint;
 
-  factory HeatmapPoint.fromJson(Map<String, dynamic> json) => _$HeatmapPointFromJson(json);
 }

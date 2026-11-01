@@ -12,6 +12,7 @@ part of 'advisories_raw.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$AdvisoriesRaw {
 
@@ -22,6 +23,8 @@ mixin _$AdvisoriesRaw {
 @pragma('vm:prefer-inline')
 $AdvisoriesRawCopyWith<AdvisoriesRaw> get copyWith => _$AdvisoriesRawCopyWithImpl<AdvisoriesRaw>(this as AdvisoriesRaw, _$identity);
 
+  /// Serializes this AdvisoriesRaw to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -30,7 +33,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is AdvisoriesRaw&&(identical(other.success, _this.success) || other.success == _this.success)&&(identical(other.scrapedAt, _this.scrapedAt) || other.scrapedAt == _this.scrapedAt)&&const DeepCollectionEquality().equals(other.advisories, _this.advisories)&&(identical(other.totalCount, _this.totalCount) || other.totalCount == _this.totalCount)&&(identical(other.activeFloodCount, _this.activeFloodCount) || other.activeFloodCount == _this.activeFloodCount)&&const DeepCollectionEquality().equals(other.meta, _this.meta));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as AdvisoriesRaw;
@@ -214,11 +217,11 @@ return $default(_that.success,_that.scrapedAt,_that.advisories,_that.totalCount,
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _AdvisoriesRaw implements AdvisoriesRaw {
   const _AdvisoriesRaw({required this.success, required this.scrapedAt, required  List<Map<String, dynamic>>? advisories, required this.totalCount, required this.activeFloodCount, required  Map<String, dynamic>? meta}): _advisories = advisories,_meta = meta;
-  
+  factory _AdvisoriesRaw.fromJson(Map<String, dynamic> json) => _$AdvisoriesRawFromJson(json);
 
 @override final  bool? success;
 @override final  String? scrapedAt;
@@ -249,14 +252,17 @@ class _AdvisoriesRaw implements AdvisoriesRaw {
 @pragma('vm:prefer-inline')
 _$AdvisoriesRawCopyWith<_AdvisoriesRaw> get copyWith => __$AdvisoriesRawCopyWithImpl<_AdvisoriesRaw>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$AdvisoriesRawToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _AdvisoriesRaw&&(identical(other.success, success) || other.success == success)&&(identical(other.scrapedAt, scrapedAt) || other.scrapedAt == scrapedAt)&&const DeepCollectionEquality().equals(other.advisories, _advisories)&&(identical(other.totalCount, totalCount) || other.totalCount == totalCount)&&(identical(other.activeFloodCount, activeFloodCount) || other.activeFloodCount == activeFloodCount)&&const DeepCollectionEquality().equals(other.meta, _meta));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hash(runtimeType,success,scrapedAt,const DeepCollectionEquality().hash(_advisories),totalCount,activeFloodCount,const DeepCollectionEquality().hash(_meta));

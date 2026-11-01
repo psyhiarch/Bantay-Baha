@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bantay_baha/data/models/advisories_raw.dart';
 import 'package:bantay_baha/data/models/flood_raw.dart';
 import 'package:bantay_baha/data/models/telemetry_raw.dart';
 import 'package:http/http.dart' as http;
@@ -28,5 +29,14 @@ class FloodApiService {
     );
     final Map<String, dynamic> json = jsonDecode(response.body);
     return TelemetryRaw.fromJson(json);
+  }
+
+  Future<AdvisoriesRaw> fetchAdvisories() async {
+       final http.Response response = await http.get(
+      Uri.https(_baseUrl, _advisories),
+    );
+    final Map<String, dynamic> json = jsonDecode(response.body);
+    return AdvisoriesRaw.fromJson(json);
+    
   }
 }

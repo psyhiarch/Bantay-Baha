@@ -12,7 +12,6 @@ part of 'weather.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$Weather {
 
@@ -23,8 +22,6 @@ mixin _$Weather {
 @pragma('vm:prefer-inline')
 $WeatherCopyWith<Weather> get copyWith => _$WeatherCopyWithImpl<Weather>(this as Weather, _$identity);
 
-  /// Serializes this Weather to a JSON map.
-  Map<String, dynamic> toJson();
 
 
 @override
@@ -33,7 +30,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Weather&&(identical(other.metroManilaRainMmHr, _this.metroManilaRainMmHr) || other.metroManilaRainMmHr == _this.metroManilaRainMmHr)&&(identical(other.metroManilaRain24hMm, _this.metroManilaRain24hMm) || other.metroManilaRain24hMm == _this.metroManilaRain24hMm)&&(identical(other.forecast3hTotalMm, _this.forecast3hTotalMm) || other.forecast3hTotalMm == _this.forecast3hTotalMm)&&(identical(other.trend, _this.trend) || other.trend == _this.trend)&&(identical(other.conditionLabel, _this.conditionLabel) || other.conditionLabel == _this.conditionLabel));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
   final _this = this as Weather;
@@ -216,11 +213,11 @@ return $default(_that.metroManilaRainMmHr,_that.metroManilaRain24hMm,_that.forec
 }
 
 /// @nodoc
-@JsonSerializable()
+
 
 class _Weather implements Weather {
   const _Weather({required this.metroManilaRainMmHr, required this.metroManilaRain24hMm, required this.forecast3hTotalMm, required this.trend, required this.conditionLabel});
-  factory _Weather.fromJson(Map<String, dynamic> json) => _$WeatherFromJson(json);
+  
 
 @override final  double metroManilaRainMmHr;
 @override final  double metroManilaRain24hMm;
@@ -234,17 +231,14 @@ class _Weather implements Weather {
 @pragma('vm:prefer-inline')
 _$WeatherCopyWith<_Weather> get copyWith => __$WeatherCopyWithImpl<_Weather>(this, _$identity);
 
-@override
-Map<String, dynamic> toJson() {
-  return _$WeatherToJson(this, );
-}
+
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Weather&&(identical(other.metroManilaRainMmHr, metroManilaRainMmHr) || other.metroManilaRainMmHr == metroManilaRainMmHr)&&(identical(other.metroManilaRain24hMm, metroManilaRain24hMm) || other.metroManilaRain24hMm == metroManilaRain24hMm)&&(identical(other.forecast3hTotalMm, forecast3hTotalMm) || other.forecast3hTotalMm == forecast3hTotalMm)&&(identical(other.trend, trend) || other.trend == trend)&&(identical(other.conditionLabel, conditionLabel) || other.conditionLabel == conditionLabel));
 }
 
-@JsonKey(includeFromJson: false, includeToJson: false)
+
 @override
 int get hashCode {
     return Object.hash(runtimeType,metroManilaRainMmHr,metroManilaRain24hMm,forecast3hTotalMm,trend,conditionLabel);

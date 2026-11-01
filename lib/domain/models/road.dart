@@ -3,7 +3,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'road.freezed.dart';
-part 'road.g.dart';
 
 @freezed
 abstract class Road with _$Road{
@@ -32,5 +31,4 @@ abstract class Road with _$Road{
     required String description,
   }) = _Road;
 
-  factory Road.fromJson(Map<String, dynamic> json) => _$RoadFromJson(json);
 }

@@ -1,9 +1,12 @@
 import 'dart:developer';
 
 import 'package:bantay_baha/core/mapper.dart';
+import 'package:bantay_baha/data/models/advisories_raw.dart';
+import 'package:bantay_baha/data/models/advisory_raw.dart';
 import 'package:bantay_baha/data/models/flood_raw.dart';
 import 'package:bantay_baha/data/models/telemetry_raw.dart';
 import 'package:bantay_baha/data/services/flood_api_service.dart';
+import 'package:bantay_baha/domain/models/advisory.dart';
 import 'package:bantay_baha/domain/models/flood.dart';
 import 'package:bantay_baha/domain/models/telemetry.dart';
 import 'package:bantay_baha/domain/repositories/flood_repository.dart';
@@ -33,6 +36,20 @@ class FloodRepositoryImpl implements FloodRepository {
       return telemetry;
     } catch (e) {
       log('$e');
+      return null;
+    }
+  }
+
+  @override
+  Future<List<Advisory>?> getAdvisories() async {
+    try {
+      final AdvisoriesRaw advisoriesRaw = await _floodApiService
+          .fetchAdvisories();
+      final List<Advisory>? advisories = advisoriesRaw.advisories
+          ?.map((i) => AdvisoryRaw.fromJson(i).toDomain())
+          .toList();
+      return advisories;
+    } catch (e) {
       return null;
     }
   }

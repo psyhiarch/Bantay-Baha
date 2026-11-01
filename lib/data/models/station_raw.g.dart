@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'station.dart';
+part of 'station_raw.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_Station _$StationFromJson(Map<String, dynamic> json) => _Station(
+_StationRaw _$StationRawFromJson(Map<String, dynamic> json) => _StationRaw(
   stationId: json['stationId'] as String,
   stationName: json['stationName'] as String,
   latitude: (json['latitude'] as num).toDouble(),
@@ -20,22 +20,23 @@ _Station _$StationFromJson(Map<String, dynamic> json) => _Station(
   waterRiskLevel: json['waterRiskLevel'] as String,
   rainRiskLevel: json['rainRiskLevel'] as String,
   riskLevel: json['riskLevel'] as String,
-  lastUpdated: DateTime.parse(json['lastUpdated'] as String),
+  lastUpdated: json['lastUpdated'] as String,
 );
 
-Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
-  'stationId': instance.stationId,
-  'stationName': instance.stationName,
-  'latitude': instance.latitude,
-  'longitude': instance.longitude,
-  'geohash': instance.geohash,
-  'rain10m': instance.rain10m,
-  'rain1h': instance.rain1h,
-  'rain24h': instance.rain24h,
-  'waterLevel': instance.waterLevel,
-  'waterLevelDelta1h': instance.waterLevelDelta1h,
-  'waterRiskLevel': instance.waterRiskLevel,
-  'rainRiskLevel': instance.rainRiskLevel,
-  'riskLevel': instance.riskLevel,
-  'lastUpdated': instance.lastUpdated.toIso8601String(),
-};
+Map<String, dynamic> _$StationRawToJson(_StationRaw instance) =>
+    <String, dynamic>{
+      'stationId': instance.stationId,
+      'stationName': instance.stationName,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
+      'geohash': instance.geohash,
+      'rain10m': instance.rain10m,
+      'rain1h': instance.rain1h,
+      'rain24h': instance.rain24h,
+      'waterLevel': instance.waterLevel,
+      'waterLevelDelta1h': instance.waterLevelDelta1h,
+      'waterRiskLevel': instance.waterRiskLevel,
+      'rainRiskLevel': instance.rainRiskLevel,
+      'riskLevel': instance.riskLevel,
+      'lastUpdated': instance.lastUpdated,
+    };
