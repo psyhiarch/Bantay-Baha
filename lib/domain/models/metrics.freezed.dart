@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Metrics {
 
- int get totalStations; int get highRiskStationsCount; double get peakWaterLevel; String get peakWaterStation; double get maxRain1h; double get maxRain24h;
+ int get totalStations; int get highRiskStationsCount; int get floodedRoadsCount; double get peakWaterLevel; String get peakWaterStation; String get peakWaterStationId; double get maxRain1h; String get maxRain1hStation; String get maxRain1hStationId; double get maxRain24h; String get maxRain24hStation; String get maxRain24hStationId;
 /// Create a copy of Metrics
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $MetricsCopyWith<Metrics> get copyWith => _$MetricsCopyWithImpl<Metrics>(this as
 @override
 bool operator ==(Object other) {
   final _this = this as Metrics;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Metrics&&(identical(other.totalStations, _this.totalStations) || other.totalStations == _this.totalStations)&&(identical(other.highRiskStationsCount, _this.highRiskStationsCount) || other.highRiskStationsCount == _this.highRiskStationsCount)&&(identical(other.peakWaterLevel, _this.peakWaterLevel) || other.peakWaterLevel == _this.peakWaterLevel)&&(identical(other.peakWaterStation, _this.peakWaterStation) || other.peakWaterStation == _this.peakWaterStation)&&(identical(other.maxRain1h, _this.maxRain1h) || other.maxRain1h == _this.maxRain1h)&&(identical(other.maxRain24h, _this.maxRain24h) || other.maxRain24h == _this.maxRain24h));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Metrics&&(identical(other.totalStations, _this.totalStations) || other.totalStations == _this.totalStations)&&(identical(other.highRiskStationsCount, _this.highRiskStationsCount) || other.highRiskStationsCount == _this.highRiskStationsCount)&&(identical(other.floodedRoadsCount, _this.floodedRoadsCount) || other.floodedRoadsCount == _this.floodedRoadsCount)&&(identical(other.peakWaterLevel, _this.peakWaterLevel) || other.peakWaterLevel == _this.peakWaterLevel)&&(identical(other.peakWaterStation, _this.peakWaterStation) || other.peakWaterStation == _this.peakWaterStation)&&(identical(other.peakWaterStationId, _this.peakWaterStationId) || other.peakWaterStationId == _this.peakWaterStationId)&&(identical(other.maxRain1h, _this.maxRain1h) || other.maxRain1h == _this.maxRain1h)&&(identical(other.maxRain1hStation, _this.maxRain1hStation) || other.maxRain1hStation == _this.maxRain1hStation)&&(identical(other.maxRain1hStationId, _this.maxRain1hStationId) || other.maxRain1hStationId == _this.maxRain1hStationId)&&(identical(other.maxRain24h, _this.maxRain24h) || other.maxRain24h == _this.maxRain24h)&&(identical(other.maxRain24hStation, _this.maxRain24hStation) || other.maxRain24hStation == _this.maxRain24hStation)&&(identical(other.maxRain24hStationId, _this.maxRain24hStationId) || other.maxRain24hStationId == _this.maxRain24hStationId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Metrics;
-  return Object.hash(runtimeType,_this.totalStations,_this.highRiskStationsCount,_this.peakWaterLevel,_this.peakWaterStation,_this.maxRain1h,_this.maxRain24h);
+  return Object.hash(runtimeType,_this.totalStations,_this.highRiskStationsCount,_this.floodedRoadsCount,_this.peakWaterLevel,_this.peakWaterStation,_this.peakWaterStationId,_this.maxRain1h,_this.maxRain1hStation,_this.maxRain1hStationId,_this.maxRain24h,_this.maxRain24hStation,_this.maxRain24hStationId);
 }
 
 @override
 String toString() {
   final _this = this as Metrics;
-  return 'Metrics(totalStations: ${_this.totalStations}, highRiskStationsCount: ${_this.highRiskStationsCount}, peakWaterLevel: ${_this.peakWaterLevel}, peakWaterStation: ${_this.peakWaterStation}, maxRain1h: ${_this.maxRain1h}, maxRain24h: ${_this.maxRain24h})';
+  return 'Metrics(totalStations: ${_this.totalStations}, highRiskStationsCount: ${_this.highRiskStationsCount}, floodedRoadsCount: ${_this.floodedRoadsCount}, peakWaterLevel: ${_this.peakWaterLevel}, peakWaterStation: ${_this.peakWaterStation}, peakWaterStationId: ${_this.peakWaterStationId}, maxRain1h: ${_this.maxRain1h}, maxRain1hStation: ${_this.maxRain1hStation}, maxRain1hStationId: ${_this.maxRain1hStationId}, maxRain24h: ${_this.maxRain24h}, maxRain24hStation: ${_this.maxRain24hStation}, maxRain24hStationId: ${_this.maxRain24hStationId})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $MetricsCopyWith<$Res>  {
   factory $MetricsCopyWith(Metrics value, $Res Function(Metrics) _then) = _$MetricsCopyWithImpl;
 @useResult
 $Res call({
- int totalStations, int highRiskStationsCount, double peakWaterLevel, String peakWaterStation, double maxRain1h, double maxRain24h
+ int totalStations, int highRiskStationsCount, int floodedRoadsCount, double peakWaterLevel, String peakWaterStation, String peakWaterStationId, double maxRain1h, String maxRain1hStation, String maxRain1hStationId, double maxRain24h, String maxRain24hStation, String maxRain24hStationId
 });
 
 
@@ -71,15 +71,21 @@ class _$MetricsCopyWithImpl<$Res>
 
 /// Create a copy of Metrics
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalStations = null,Object? highRiskStationsCount = null,Object? peakWaterLevel = null,Object? peakWaterStation = null,Object? maxRain1h = null,Object? maxRain24h = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? totalStations = null,Object? highRiskStationsCount = null,Object? floodedRoadsCount = null,Object? peakWaterLevel = null,Object? peakWaterStation = null,Object? peakWaterStationId = null,Object? maxRain1h = null,Object? maxRain1hStation = null,Object? maxRain1hStationId = null,Object? maxRain24h = null,Object? maxRain24hStation = null,Object? maxRain24hStationId = null,}) {
   return _then(Metrics(
 totalStations: null == totalStations ? _self.totalStations : totalStations // ignore: cast_nullable_to_non_nullable
 as int,highRiskStationsCount: null == highRiskStationsCount ? _self.highRiskStationsCount : highRiskStationsCount // ignore: cast_nullable_to_non_nullable
+as int,floodedRoadsCount: null == floodedRoadsCount ? _self.floodedRoadsCount : floodedRoadsCount // ignore: cast_nullable_to_non_nullable
 as int,peakWaterLevel: null == peakWaterLevel ? _self.peakWaterLevel : peakWaterLevel // ignore: cast_nullable_to_non_nullable
 as double,peakWaterStation: null == peakWaterStation ? _self.peakWaterStation : peakWaterStation // ignore: cast_nullable_to_non_nullable
+as String,peakWaterStationId: null == peakWaterStationId ? _self.peakWaterStationId : peakWaterStationId // ignore: cast_nullable_to_non_nullable
 as String,maxRain1h: null == maxRain1h ? _self.maxRain1h : maxRain1h // ignore: cast_nullable_to_non_nullable
-as double,maxRain24h: null == maxRain24h ? _self.maxRain24h : maxRain24h // ignore: cast_nullable_to_non_nullable
-as double,
+as double,maxRain1hStation: null == maxRain1hStation ? _self.maxRain1hStation : maxRain1hStation // ignore: cast_nullable_to_non_nullable
+as String,maxRain1hStationId: null == maxRain1hStationId ? _self.maxRain1hStationId : maxRain1hStationId // ignore: cast_nullable_to_non_nullable
+as String,maxRain24h: null == maxRain24h ? _self.maxRain24h : maxRain24h // ignore: cast_nullable_to_non_nullable
+as double,maxRain24hStation: null == maxRain24hStation ? _self.maxRain24hStation : maxRain24hStation // ignore: cast_nullable_to_non_nullable
+as String,maxRain24hStationId: null == maxRain24hStationId ? _self.maxRain24hStationId : maxRain24hStationId // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -164,10 +170,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalStations,  int highRiskStationsCount,  double peakWaterLevel,  String peakWaterStation,  double maxRain1h,  double maxRain24h)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalStations,  int highRiskStationsCount,  int floodedRoadsCount,  double peakWaterLevel,  String peakWaterStation,  String peakWaterStationId,  double maxRain1h,  String maxRain1hStation,  String maxRain1hStationId,  double maxRain24h,  String maxRain24hStation,  String maxRain24hStationId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Metrics() when $default != null:
-return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterLevel,_that.peakWaterStation,_that.maxRain1h,_that.maxRain24h);case _:
+return $default(_that.totalStations,_that.highRiskStationsCount,_that.floodedRoadsCount,_that.peakWaterLevel,_that.peakWaterStation,_that.peakWaterStationId,_that.maxRain1h,_that.maxRain1hStation,_that.maxRain1hStationId,_that.maxRain24h,_that.maxRain24hStation,_that.maxRain24hStationId);case _:
   return orElse();
 
 }
@@ -185,10 +191,10 @@ return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterL
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalStations,  int highRiskStationsCount,  double peakWaterLevel,  String peakWaterStation,  double maxRain1h,  double maxRain24h)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalStations,  int highRiskStationsCount,  int floodedRoadsCount,  double peakWaterLevel,  String peakWaterStation,  String peakWaterStationId,  double maxRain1h,  String maxRain1hStation,  String maxRain1hStationId,  double maxRain24h,  String maxRain24hStation,  String maxRain24hStationId)  $default,) {final _that = this;
 switch (_that) {
 case _Metrics():
-return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterLevel,_that.peakWaterStation,_that.maxRain1h,_that.maxRain24h);case _:
+return $default(_that.totalStations,_that.highRiskStationsCount,_that.floodedRoadsCount,_that.peakWaterLevel,_that.peakWaterStation,_that.peakWaterStationId,_that.maxRain1h,_that.maxRain1hStation,_that.maxRain1hStationId,_that.maxRain24h,_that.maxRain24hStation,_that.maxRain24hStationId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +211,10 @@ return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterL
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalStations,  int highRiskStationsCount,  double peakWaterLevel,  String peakWaterStation,  double maxRain1h,  double maxRain24h)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalStations,  int highRiskStationsCount,  int floodedRoadsCount,  double peakWaterLevel,  String peakWaterStation,  String peakWaterStationId,  double maxRain1h,  String maxRain1hStation,  String maxRain1hStationId,  double maxRain24h,  String maxRain24hStation,  String maxRain24hStationId)?  $default,) {final _that = this;
 switch (_that) {
 case _Metrics() when $default != null:
-return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterLevel,_that.peakWaterStation,_that.maxRain1h,_that.maxRain24h);case _:
+return $default(_that.totalStations,_that.highRiskStationsCount,_that.floodedRoadsCount,_that.peakWaterLevel,_that.peakWaterStation,_that.peakWaterStationId,_that.maxRain1h,_that.maxRain1hStation,_that.maxRain1hStationId,_that.maxRain24h,_that.maxRain24hStation,_that.maxRain24hStationId);case _:
   return null;
 
 }
@@ -220,15 +226,21 @@ return $default(_that.totalStations,_that.highRiskStationsCount,_that.peakWaterL
 @JsonSerializable()
 
 class _Metrics implements Metrics {
-  const _Metrics({required this.totalStations, required this.highRiskStationsCount, required this.peakWaterLevel, required this.peakWaterStation, required this.maxRain1h, required this.maxRain24h});
+  const _Metrics({required this.totalStations, required this.highRiskStationsCount, required this.floodedRoadsCount, required this.peakWaterLevel, required this.peakWaterStation, required this.peakWaterStationId, required this.maxRain1h, required this.maxRain1hStation, required this.maxRain1hStationId, required this.maxRain24h, required this.maxRain24hStation, required this.maxRain24hStationId});
   factory _Metrics.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
 
 @override final  int totalStations;
 @override final  int highRiskStationsCount;
+@override final  int floodedRoadsCount;
 @override final  double peakWaterLevel;
 @override final  String peakWaterStation;
+@override final  String peakWaterStationId;
 @override final  double maxRain1h;
+@override final  String maxRain1hStation;
+@override final  String maxRain1hStationId;
 @override final  double maxRain24h;
+@override final  String maxRain24hStation;
+@override final  String maxRain24hStationId;
 
 /// Create a copy of Metrics
 /// with the given fields replaced by the non-null parameter values.
@@ -243,18 +255,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Metrics&&(identical(other.totalStations, totalStations) || other.totalStations == totalStations)&&(identical(other.highRiskStationsCount, highRiskStationsCount) || other.highRiskStationsCount == highRiskStationsCount)&&(identical(other.peakWaterLevel, peakWaterLevel) || other.peakWaterLevel == peakWaterLevel)&&(identical(other.peakWaterStation, peakWaterStation) || other.peakWaterStation == peakWaterStation)&&(identical(other.maxRain1h, maxRain1h) || other.maxRain1h == maxRain1h)&&(identical(other.maxRain24h, maxRain24h) || other.maxRain24h == maxRain24h));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Metrics&&(identical(other.totalStations, totalStations) || other.totalStations == totalStations)&&(identical(other.highRiskStationsCount, highRiskStationsCount) || other.highRiskStationsCount == highRiskStationsCount)&&(identical(other.floodedRoadsCount, floodedRoadsCount) || other.floodedRoadsCount == floodedRoadsCount)&&(identical(other.peakWaterLevel, peakWaterLevel) || other.peakWaterLevel == peakWaterLevel)&&(identical(other.peakWaterStation, peakWaterStation) || other.peakWaterStation == peakWaterStation)&&(identical(other.peakWaterStationId, peakWaterStationId) || other.peakWaterStationId == peakWaterStationId)&&(identical(other.maxRain1h, maxRain1h) || other.maxRain1h == maxRain1h)&&(identical(other.maxRain1hStation, maxRain1hStation) || other.maxRain1hStation == maxRain1hStation)&&(identical(other.maxRain1hStationId, maxRain1hStationId) || other.maxRain1hStationId == maxRain1hStationId)&&(identical(other.maxRain24h, maxRain24h) || other.maxRain24h == maxRain24h)&&(identical(other.maxRain24hStation, maxRain24hStation) || other.maxRain24hStation == maxRain24hStation)&&(identical(other.maxRain24hStationId, maxRain24hStationId) || other.maxRain24hStationId == maxRain24hStationId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,totalStations,highRiskStationsCount,peakWaterLevel,peakWaterStation,maxRain1h,maxRain24h);
+    return Object.hash(runtimeType,totalStations,highRiskStationsCount,floodedRoadsCount,peakWaterLevel,peakWaterStation,peakWaterStationId,maxRain1h,maxRain1hStation,maxRain1hStationId,maxRain24h,maxRain24hStation,maxRain24hStationId);
 }
 
 @override
 String toString() {
-    return 'Metrics(totalStations: $totalStations, highRiskStationsCount: $highRiskStationsCount, peakWaterLevel: $peakWaterLevel, peakWaterStation: $peakWaterStation, maxRain1h: $maxRain1h, maxRain24h: $maxRain24h)';
+    return 'Metrics(totalStations: $totalStations, highRiskStationsCount: $highRiskStationsCount, floodedRoadsCount: $floodedRoadsCount, peakWaterLevel: $peakWaterLevel, peakWaterStation: $peakWaterStation, peakWaterStationId: $peakWaterStationId, maxRain1h: $maxRain1h, maxRain1hStation: $maxRain1hStation, maxRain1hStationId: $maxRain1hStationId, maxRain24h: $maxRain24h, maxRain24hStation: $maxRain24hStation, maxRain24hStationId: $maxRain24hStationId)';
 }
 
 
@@ -265,7 +277,7 @@ abstract mixin class _$MetricsCopyWith<$Res> implements $MetricsCopyWith<$Res> {
   factory _$MetricsCopyWith(_Metrics value, $Res Function(_Metrics) _then) = __$MetricsCopyWithImpl;
 @override @useResult
 $Res call({
- int totalStations, int highRiskStationsCount, double peakWaterLevel, String peakWaterStation, double maxRain1h, double maxRain24h
+ int totalStations, int highRiskStationsCount, int floodedRoadsCount, double peakWaterLevel, String peakWaterStation, String peakWaterStationId, double maxRain1h, String maxRain1hStation, String maxRain1hStationId, double maxRain24h, String maxRain24hStation, String maxRain24hStationId
 });
 
 
@@ -282,15 +294,21 @@ class __$MetricsCopyWithImpl<$Res>
 
 /// Create a copy of Metrics
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalStations = null,Object? highRiskStationsCount = null,Object? peakWaterLevel = null,Object? peakWaterStation = null,Object? maxRain1h = null,Object? maxRain24h = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? totalStations = null,Object? highRiskStationsCount = null,Object? floodedRoadsCount = null,Object? peakWaterLevel = null,Object? peakWaterStation = null,Object? peakWaterStationId = null,Object? maxRain1h = null,Object? maxRain1hStation = null,Object? maxRain1hStationId = null,Object? maxRain24h = null,Object? maxRain24hStation = null,Object? maxRain24hStationId = null,}) {
   return _then(_Metrics(
 totalStations: null == totalStations ? _self.totalStations : totalStations // ignore: cast_nullable_to_non_nullable
 as int,highRiskStationsCount: null == highRiskStationsCount ? _self.highRiskStationsCount : highRiskStationsCount // ignore: cast_nullable_to_non_nullable
+as int,floodedRoadsCount: null == floodedRoadsCount ? _self.floodedRoadsCount : floodedRoadsCount // ignore: cast_nullable_to_non_nullable
 as int,peakWaterLevel: null == peakWaterLevel ? _self.peakWaterLevel : peakWaterLevel // ignore: cast_nullable_to_non_nullable
 as double,peakWaterStation: null == peakWaterStation ? _self.peakWaterStation : peakWaterStation // ignore: cast_nullable_to_non_nullable
+as String,peakWaterStationId: null == peakWaterStationId ? _self.peakWaterStationId : peakWaterStationId // ignore: cast_nullable_to_non_nullable
 as String,maxRain1h: null == maxRain1h ? _self.maxRain1h : maxRain1h // ignore: cast_nullable_to_non_nullable
-as double,maxRain24h: null == maxRain24h ? _self.maxRain24h : maxRain24h // ignore: cast_nullable_to_non_nullable
-as double,
+as double,maxRain1hStation: null == maxRain1hStation ? _self.maxRain1hStation : maxRain1hStation // ignore: cast_nullable_to_non_nullable
+as String,maxRain1hStationId: null == maxRain1hStationId ? _self.maxRain1hStationId : maxRain1hStationId // ignore: cast_nullable_to_non_nullable
+as String,maxRain24h: null == maxRain24h ? _self.maxRain24h : maxRain24h // ignore: cast_nullable_to_non_nullable
+as double,maxRain24hStation: null == maxRain24hStation ? _self.maxRain24hStation : maxRain24hStation // ignore: cast_nullable_to_non_nullable
+as String,maxRain24hStationId: null == maxRain24hStationId ? _self.maxRain24hStationId : maxRain24hStationId // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

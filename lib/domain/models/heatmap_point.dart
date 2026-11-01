@@ -12,5 +12,8 @@ abstract class HeatmapPoint with _$HeatmapPoint {
     required double lng,
     required double intensity,
     required double depthCm,
+    required String category,
+    required double radius,
+    required bool isFlooded,
   }) = _HeatmapPoint;
 }
