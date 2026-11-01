@@ -1,4 +1,4 @@
-# bantay_baha
+# Bantay Baha
 
 A Real-Time Flood Monitoring System
 
@@ -14,9 +14,6 @@ This Project uses MVVM architecture
 | Ephemeral State | App State | App Wide Services |
 |-----------------|-----------|-------------------|
 |setState | ChangeNotifier | Locator/Service Locator|
-
-
-view - ValueListenableBuilder <-> viewmodel - ChangeNotifier (app state) 
 
 ### Project Structure
 
