@@ -11,7 +11,13 @@ GoRouter _goRouter = GoRouter(
   routes: [
     ShellRoute(
       routes: [
-        GoRoute(path: '/', builder: (context, state) => const HomeView()),
+        GoRoute(
+          path: '/',
+          builder: (context, state) => ChangeNotifierProvider.value(
+            value: getIt<HomeViewModel>(),
+            child: const HomeView(),
+          ),
+        ),
       ],
       builder: (context, state, child) => ShellScaffold(child: child),
     ),
