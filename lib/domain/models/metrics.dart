@@ -11,7 +11,6 @@ abstract class Metrics with _$Metrics{
   const factory Metrics({
     required int totalStations,
     required int highRiskStationsCount,
-    required int floodedRoadsCount,
     required double peakWaterLevel,
     required String peakWaterStation,
     required String peakWaterStationId,

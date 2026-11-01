@@ -12,6 +12,7 @@ part of 'telemetry_raw.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$TelemetryRaw {
 
@@ -22,6 +23,8 @@ mixin _$TelemetryRaw {
 @pragma('vm:prefer-inline')
 $TelemetryRawCopyWith<TelemetryRaw> get copyWith => _$TelemetryRawCopyWithImpl<TelemetryRaw>(this as TelemetryRaw, _$identity);
 
+  /// Serializes this TelemetryRaw to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -30,7 +33,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is TelemetryRaw&&(identical(other.success, _this.success) || other.success == _this.success)&&(identical(other.scrapedAt, _this.scrapedAt) || other.scrapedAt == _this.scrapedAt)&&(identical(other.cachedAt, _this.cachedAt) || other.cachedAt == _this.cachedAt)&&const DeepCollectionEquality().equals(other.metrics, _this.metrics)&&const DeepCollectionEquality().equals(other.stations, _this.stations));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as TelemetryRaw;
@@ -213,11 +216,11 @@ return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _TelemetryRaw implements TelemetryRaw {
   const _TelemetryRaw({required this.success, required this.scrapedAt, required this.cachedAt, required  Map<String, dynamic>? metrics, required  List<Map<String, dynamic>>? stations}): _metrics = metrics,_stations = stations;
-  
+  factory _TelemetryRaw.fromJson(Map<String, dynamic> json) => _$TelemetryRawFromJson(json);
 
 @override final  bool? success;
 @override final  String? scrapedAt;
@@ -247,14 +250,17 @@ class _TelemetryRaw implements TelemetryRaw {
 @pragma('vm:prefer-inline')
 _$TelemetryRawCopyWith<_TelemetryRaw> get copyWith => __$TelemetryRawCopyWithImpl<_TelemetryRaw>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$TelemetryRawToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _TelemetryRaw&&(identical(other.success, success) || other.success == success)&&(identical(other.scrapedAt, scrapedAt) || other.scrapedAt == scrapedAt)&&(identical(other.cachedAt, cachedAt) || other.cachedAt == cachedAt)&&const DeepCollectionEquality().equals(other.metrics, _metrics)&&const DeepCollectionEquality().equals(other.stations, _stations));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hash(runtimeType,success,scrapedAt,cachedAt,const DeepCollectionEquality().hash(_metrics),const DeepCollectionEquality().hash(_stations));

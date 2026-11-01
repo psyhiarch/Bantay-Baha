@@ -20,6 +20,7 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     final stations = context.watch<HomeViewModel>().stations;
     final metrics = context.watch<HomeViewModel>().metrics;
-    return Text('${metrics?.peakWaterStation}');
+    final telemetry = context.watch<HomeViewModel>().telemetry;
+    return Text('');
   }
 }

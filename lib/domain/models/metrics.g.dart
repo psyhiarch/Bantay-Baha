@@ -9,7 +9,6 @@ part of 'metrics.dart';
 _Metrics _$MetricsFromJson(Map<String, dynamic> json) => _Metrics(
   totalStations: (json['totalStations'] as num).toInt(),
   highRiskStationsCount: (json['highRiskStationsCount'] as num).toInt(),
-  floodedRoadsCount: (json['floodedRoadsCount'] as num).toInt(),
   peakWaterLevel: (json['peakWaterLevel'] as num).toDouble(),
   peakWaterStation: json['peakWaterStation'] as String,
   peakWaterStationId: json['peakWaterStationId'] as String,
@@ -24,7 +23,6 @@ _Metrics _$MetricsFromJson(Map<String, dynamic> json) => _Metrics(
 Map<String, dynamic> _$MetricsToJson(_Metrics instance) => <String, dynamic>{
   'totalStations': instance.totalStations,
   'highRiskStationsCount': instance.highRiskStationsCount,
-  'floodedRoadsCount': instance.floodedRoadsCount,
   'peakWaterLevel': instance.peakWaterLevel,
   'peakWaterStation': instance.peakWaterStation,
   'peakWaterStationId': instance.peakWaterStationId,
