@@ -23,5 +23,5 @@ abstract class Metrics with _$Metrics{
     required String maxRain24hStationId,
   }) = _Metrics;
 
-  factory Metrics.fromJson(Map<String, Object?> json) => _$MetricsFromJson(json);
+  factory Metrics.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
 }

@@ -13,18 +13,13 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    Provider.of<HomeViewModel>(context, listen: false).initFlood();
+    Provider.of<HomeViewModel>(context, listen: false).init();
   }
 
   @override
   Widget build(BuildContext context) {
     final stations = context.watch<HomeViewModel>().stations;
-
-    return ListView.builder(
-      itemCount: stations.length,
-      itemBuilder: (context, index) {
-        return ListTile(title: Text(stations[index].stationName));
-      },
-    );
+    final metrics = context.watch<HomeViewModel>().metrics;
+    return Text('${metrics?.peakWaterStation}');
   }
 }

@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FloodRaw {
 
- bool get success; String get calculatedAt; String get scrapedAt; Map<String, dynamic> get metrics; List<Map<String, dynamic>> get stations; List<Map<String, dynamic>> get roads; List<Map<String, dynamic>> get heatmapPoints; Map<String, dynamic> get weather;
+ bool? get success; String? get calculatedAt; String? get scrapedAt; Map<String, dynamic>? get metrics; List<Map<String, dynamic>>? get stations; List<Map<String, dynamic>>? get roads; List<Map<String, dynamic>>? get heatmapPoints; Map<String, dynamic>? get weather;
 /// Create a copy of FloodRaw
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -54,7 +54,7 @@ abstract mixin class $FloodRawCopyWith<$Res>  {
   factory $FloodRawCopyWith(FloodRaw value, $Res Function(FloodRaw) _then) = _$FloodRawCopyWithImpl;
 @useResult
 $Res call({
- bool success, String calculatedAt, String scrapedAt, Map<String, dynamic> metrics, List<Map<String, dynamic>> stations, List<Map<String, dynamic>> roads, List<Map<String, dynamic>> heatmapPoints, Map<String, dynamic> weather
+ bool? success, String? calculatedAt, String? scrapedAt, Map<String, dynamic>? metrics, List<Map<String, dynamic>>? stations, List<Map<String, dynamic>>? roads, List<Map<String, dynamic>>? heatmapPoints, Map<String, dynamic>? weather
 });
 
 
@@ -71,17 +71,17 @@ class _$FloodRawCopyWithImpl<$Res>
 
 /// Create a copy of FloodRaw
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? success = null,Object? calculatedAt = null,Object? scrapedAt = null,Object? metrics = null,Object? stations = null,Object? roads = null,Object? heatmapPoints = null,Object? weather = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? success = freezed,Object? calculatedAt = freezed,Object? scrapedAt = freezed,Object? metrics = freezed,Object? stations = freezed,Object? roads = freezed,Object? heatmapPoints = freezed,Object? weather = freezed,}) {
   return _then(FloodRaw(
-success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
-as bool,calculatedAt: null == calculatedAt ? _self.calculatedAt : calculatedAt // ignore: cast_nullable_to_non_nullable
-as String,scrapedAt: null == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
-as String,metrics: null == metrics ? _self.metrics : metrics // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,stations: null == stations ? _self.stations : stations // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,roads: null == roads ? _self.roads : roads // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,heatmapPoints: null == heatmapPoints ? _self.heatmapPoints : heatmapPoints // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,weather: null == weather ? _self.weather : weather // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+success: freezed == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool?,calculatedAt: freezed == calculatedAt ? _self.calculatedAt : calculatedAt // ignore: cast_nullable_to_non_nullable
+as String?,scrapedAt: freezed == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
+as String?,metrics: freezed == metrics ? _self.metrics : metrics // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,stations: freezed == stations ? _self.stations : stations // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,roads: freezed == roads ? _self.roads : roads // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,heatmapPoints: freezed == heatmapPoints ? _self.heatmapPoints : heatmapPoints // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,weather: freezed == weather ? _self.weather : weather // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
   ));
 }
 
@@ -166,7 +166,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool success,  String calculatedAt,  String scrapedAt,  Map<String, dynamic> metrics,  List<Map<String, dynamic>> stations,  List<Map<String, dynamic>> roads,  List<Map<String, dynamic>> heatmapPoints,  Map<String, dynamic> weather)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool? success,  String? calculatedAt,  String? scrapedAt,  Map<String, dynamic>? metrics,  List<Map<String, dynamic>>? stations,  List<Map<String, dynamic>>? roads,  List<Map<String, dynamic>>? heatmapPoints,  Map<String, dynamic>? weather)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FloodRaw() when $default != null:
 return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_that.stations,_that.roads,_that.heatmapPoints,_that.weather);case _:
@@ -187,7 +187,7 @@ return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool success,  String calculatedAt,  String scrapedAt,  Map<String, dynamic> metrics,  List<Map<String, dynamic>> stations,  List<Map<String, dynamic>> roads,  List<Map<String, dynamic>> heatmapPoints,  Map<String, dynamic> weather)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool? success,  String? calculatedAt,  String? scrapedAt,  Map<String, dynamic>? metrics,  List<Map<String, dynamic>>? stations,  List<Map<String, dynamic>>? roads,  List<Map<String, dynamic>>? heatmapPoints,  Map<String, dynamic>? weather)  $default,) {final _that = this;
 switch (_that) {
 case _FloodRaw():
 return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_that.stations,_that.roads,_that.heatmapPoints,_that.weather);case _:
@@ -207,7 +207,7 @@ return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool success,  String calculatedAt,  String scrapedAt,  Map<String, dynamic> metrics,  List<Map<String, dynamic>> stations,  List<Map<String, dynamic>> roads,  List<Map<String, dynamic>> heatmapPoints,  Map<String, dynamic> weather)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool? success,  String? calculatedAt,  String? scrapedAt,  Map<String, dynamic>? metrics,  List<Map<String, dynamic>>? stations,  List<Map<String, dynamic>>? roads,  List<Map<String, dynamic>>? heatmapPoints,  Map<String, dynamic>? weather)?  $default,) {final _that = this;
 switch (_that) {
 case _FloodRaw() when $default != null:
 return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_that.stations,_that.roads,_that.heatmapPoints,_that.weather);case _:
@@ -222,45 +222,55 @@ return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_
 @JsonSerializable()
 
 class _FloodRaw implements FloodRaw {
-  const _FloodRaw({required this.success, required this.calculatedAt, required this.scrapedAt, required  Map<String, dynamic> metrics, required  List<Map<String, dynamic>> stations, required  List<Map<String, dynamic>> roads, required  List<Map<String, dynamic>> heatmapPoints, required  Map<String, dynamic> weather}): _metrics = metrics,_stations = stations,_roads = roads,_heatmapPoints = heatmapPoints,_weather = weather;
+  const _FloodRaw({required this.success, required this.calculatedAt, required this.scrapedAt, required  Map<String, dynamic>? metrics, required  List<Map<String, dynamic>>? stations, required  List<Map<String, dynamic>>? roads, required  List<Map<String, dynamic>>? heatmapPoints, required  Map<String, dynamic>? weather}): _metrics = metrics,_stations = stations,_roads = roads,_heatmapPoints = heatmapPoints,_weather = weather;
   factory _FloodRaw.fromJson(Map<String, dynamic> json) => _$FloodRawFromJson(json);
 
-@override final  bool success;
-@override final  String calculatedAt;
-@override final  String scrapedAt;
- final  Map<String, dynamic> _metrics;
-@override Map<String, dynamic> get metrics {
+@override final  bool? success;
+@override final  String? calculatedAt;
+@override final  String? scrapedAt;
+ final  Map<String, dynamic>? _metrics;
+@override Map<String, dynamic>? get metrics {
+  final value = _metrics;
+  if (value == null) return null;
   if (_metrics is EqualUnmodifiableMapView) return _metrics;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_metrics);
+  return EqualUnmodifiableMapView(value);
 }
 
- final  List<Map<String, dynamic>> _stations;
-@override List<Map<String, dynamic>> get stations {
+ final  List<Map<String, dynamic>>? _stations;
+@override List<Map<String, dynamic>>? get stations {
+  final value = _stations;
+  if (value == null) return null;
   if (_stations is EqualUnmodifiableListView) return _stations;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_stations);
+  return EqualUnmodifiableListView(value);
 }
 
- final  List<Map<String, dynamic>> _roads;
-@override List<Map<String, dynamic>> get roads {
+ final  List<Map<String, dynamic>>? _roads;
+@override List<Map<String, dynamic>>? get roads {
+  final value = _roads;
+  if (value == null) return null;
   if (_roads is EqualUnmodifiableListView) return _roads;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_roads);
+  return EqualUnmodifiableListView(value);
 }
 
- final  List<Map<String, dynamic>> _heatmapPoints;
-@override List<Map<String, dynamic>> get heatmapPoints {
+ final  List<Map<String, dynamic>>? _heatmapPoints;
+@override List<Map<String, dynamic>>? get heatmapPoints {
+  final value = _heatmapPoints;
+  if (value == null) return null;
   if (_heatmapPoints is EqualUnmodifiableListView) return _heatmapPoints;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_heatmapPoints);
+  return EqualUnmodifiableListView(value);
 }
 
- final  Map<String, dynamic> _weather;
-@override Map<String, dynamic> get weather {
+ final  Map<String, dynamic>? _weather;
+@override Map<String, dynamic>? get weather {
+  final value = _weather;
+  if (value == null) return null;
   if (_weather is EqualUnmodifiableMapView) return _weather;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_weather);
+  return EqualUnmodifiableMapView(value);
 }
 
 
@@ -299,7 +309,7 @@ abstract mixin class _$FloodRawCopyWith<$Res> implements $FloodRawCopyWith<$Res>
   factory _$FloodRawCopyWith(_FloodRaw value, $Res Function(_FloodRaw) _then) = __$FloodRawCopyWithImpl;
 @override @useResult
 $Res call({
- bool success, String calculatedAt, String scrapedAt, Map<String, dynamic> metrics, List<Map<String, dynamic>> stations, List<Map<String, dynamic>> roads, List<Map<String, dynamic>> heatmapPoints, Map<String, dynamic> weather
+ bool? success, String? calculatedAt, String? scrapedAt, Map<String, dynamic>? metrics, List<Map<String, dynamic>>? stations, List<Map<String, dynamic>>? roads, List<Map<String, dynamic>>? heatmapPoints, Map<String, dynamic>? weather
 });
 
 
@@ -316,17 +326,17 @@ class __$FloodRawCopyWithImpl<$Res>
 
 /// Create a copy of FloodRaw
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? success = null,Object? calculatedAt = null,Object? scrapedAt = null,Object? metrics = null,Object? stations = null,Object? roads = null,Object? heatmapPoints = null,Object? weather = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? success = freezed,Object? calculatedAt = freezed,Object? scrapedAt = freezed,Object? metrics = freezed,Object? stations = freezed,Object? roads = freezed,Object? heatmapPoints = freezed,Object? weather = freezed,}) {
   return _then(_FloodRaw(
-success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
-as bool,calculatedAt: null == calculatedAt ? _self.calculatedAt : calculatedAt // ignore: cast_nullable_to_non_nullable
-as String,scrapedAt: null == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
-as String,metrics: null == metrics ? _self._metrics : metrics // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,stations: null == stations ? _self._stations : stations // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,roads: null == roads ? _self._roads : roads // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,heatmapPoints: null == heatmapPoints ? _self._heatmapPoints : heatmapPoints // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,weather: null == weather ? _self._weather : weather // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,
+success: freezed == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool?,calculatedAt: freezed == calculatedAt ? _self.calculatedAt : calculatedAt // ignore: cast_nullable_to_non_nullable
+as String?,scrapedAt: freezed == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
+as String?,metrics: freezed == metrics ? _self._metrics : metrics // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,stations: freezed == stations ? _self._stations : stations // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,roads: freezed == roads ? _self._roads : roads // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,heatmapPoints: freezed == heatmapPoints ? _self._heatmapPoints : heatmapPoints // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,weather: freezed == weather ? _self._weather : weather // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,
   ));
 }
 

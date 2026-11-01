@@ -236,8 +236,8 @@ return $default(_that.success,_that.calculatedAt,_that.scrapedAt,_that.metrics,_
 /// @nodoc
 
 
-class _Flood extends Flood {
-  const _Flood({required this.success, required this.calculatedAt, required this.scrapedAt, required this.metrics, required  List<Station> stations, required  List<Road> roads, required  List<HeatmapPoint> heatmapPoints, required this.weather}): _stations = stations,_roads = roads,_heatmapPoints = heatmapPoints,super._();
+class _Flood implements Flood {
+  const _Flood({required this.success, required this.calculatedAt, required this.scrapedAt, required this.metrics, required  List<Station> stations, required  List<Road> roads, required  List<HeatmapPoint> heatmapPoints, required this.weather}): _stations = stations,_roads = roads,_heatmapPoints = heatmapPoints;
   
 
 @override final  bool success;

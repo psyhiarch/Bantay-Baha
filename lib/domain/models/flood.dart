@@ -12,8 +12,6 @@ part 'flood.freezed.dart';
 @freezed
 abstract class Flood with _$Flood {
 
-  const Flood._();
-
   const factory Flood({
     required bool success,
     required DateTime calculatedAt,

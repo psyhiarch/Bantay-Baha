@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TelemetryRaw {
 
- bool get success; String get scrapedAt; String get cachedAt; Map<String, dynamic> get metrics; List<Map<String, dynamic>> get stations;
+ bool? get success; String? get scrapedAt; String? get cachedAt; Map<String, dynamic>? get metrics; List<Map<String, dynamic>>? get stations;
 /// Create a copy of TelemetryRaw
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -51,7 +51,7 @@ abstract mixin class $TelemetryRawCopyWith<$Res>  {
   factory $TelemetryRawCopyWith(TelemetryRaw value, $Res Function(TelemetryRaw) _then) = _$TelemetryRawCopyWithImpl;
 @useResult
 $Res call({
- bool success, String scrapedAt, String cachedAt, Map<String, dynamic> metrics, List<Map<String, dynamic>> stations
+ bool? success, String? scrapedAt, String? cachedAt, Map<String, dynamic>? metrics, List<Map<String, dynamic>>? stations
 });
 
 
@@ -68,14 +68,14 @@ class _$TelemetryRawCopyWithImpl<$Res>
 
 /// Create a copy of TelemetryRaw
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? success = null,Object? scrapedAt = null,Object? cachedAt = null,Object? metrics = null,Object? stations = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? success = freezed,Object? scrapedAt = freezed,Object? cachedAt = freezed,Object? metrics = freezed,Object? stations = freezed,}) {
   return _then(TelemetryRaw(
-success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
-as bool,scrapedAt: null == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
-as String,cachedAt: null == cachedAt ? _self.cachedAt : cachedAt // ignore: cast_nullable_to_non_nullable
-as String,metrics: null == metrics ? _self.metrics : metrics // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,stations: null == stations ? _self.stations : stations // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,
+success: freezed == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool?,scrapedAt: freezed == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
+as String?,cachedAt: freezed == cachedAt ? _self.cachedAt : cachedAt // ignore: cast_nullable_to_non_nullable
+as String?,metrics: freezed == metrics ? _self.metrics : metrics // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,stations: freezed == stations ? _self.stations : stations // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,
   ));
 }
 
@@ -160,7 +160,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool success,  String scrapedAt,  String cachedAt,  Map<String, dynamic> metrics,  List<Map<String, dynamic>> stations)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool? success,  String? scrapedAt,  String? cachedAt,  Map<String, dynamic>? metrics,  List<Map<String, dynamic>>? stations)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TelemetryRaw() when $default != null:
 return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that.stations);case _:
@@ -181,7 +181,7 @@ return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool success,  String scrapedAt,  String cachedAt,  Map<String, dynamic> metrics,  List<Map<String, dynamic>> stations)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool? success,  String? scrapedAt,  String? cachedAt,  Map<String, dynamic>? metrics,  List<Map<String, dynamic>>? stations)  $default,) {final _that = this;
 switch (_that) {
 case _TelemetryRaw():
 return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that.stations);case _:
@@ -201,7 +201,7 @@ return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool success,  String scrapedAt,  String cachedAt,  Map<String, dynamic> metrics,  List<Map<String, dynamic>> stations)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool? success,  String? scrapedAt,  String? cachedAt,  Map<String, dynamic>? metrics,  List<Map<String, dynamic>>? stations)?  $default,) {final _that = this;
 switch (_that) {
 case _TelemetryRaw() when $default != null:
 return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that.stations);case _:
@@ -216,24 +216,28 @@ return $default(_that.success,_that.scrapedAt,_that.cachedAt,_that.metrics,_that
 
 
 class _TelemetryRaw implements TelemetryRaw {
-  const _TelemetryRaw({required this.success, required this.scrapedAt, required this.cachedAt, required  Map<String, dynamic> metrics, required  List<Map<String, dynamic>> stations}): _metrics = metrics,_stations = stations;
+  const _TelemetryRaw({required this.success, required this.scrapedAt, required this.cachedAt, required  Map<String, dynamic>? metrics, required  List<Map<String, dynamic>>? stations}): _metrics = metrics,_stations = stations;
   
 
-@override final  bool success;
-@override final  String scrapedAt;
-@override final  String cachedAt;
- final  Map<String, dynamic> _metrics;
-@override Map<String, dynamic> get metrics {
+@override final  bool? success;
+@override final  String? scrapedAt;
+@override final  String? cachedAt;
+ final  Map<String, dynamic>? _metrics;
+@override Map<String, dynamic>? get metrics {
+  final value = _metrics;
+  if (value == null) return null;
   if (_metrics is EqualUnmodifiableMapView) return _metrics;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableMapView(_metrics);
+  return EqualUnmodifiableMapView(value);
 }
 
- final  List<Map<String, dynamic>> _stations;
-@override List<Map<String, dynamic>> get stations {
+ final  List<Map<String, dynamic>>? _stations;
+@override List<Map<String, dynamic>>? get stations {
+  final value = _stations;
+  if (value == null) return null;
   if (_stations is EqualUnmodifiableListView) return _stations;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_stations);
+  return EqualUnmodifiableListView(value);
 }
 
 
@@ -269,7 +273,7 @@ abstract mixin class _$TelemetryRawCopyWith<$Res> implements $TelemetryRawCopyWi
   factory _$TelemetryRawCopyWith(_TelemetryRaw value, $Res Function(_TelemetryRaw) _then) = __$TelemetryRawCopyWithImpl;
 @override @useResult
 $Res call({
- bool success, String scrapedAt, String cachedAt, Map<String, dynamic> metrics, List<Map<String, dynamic>> stations
+ bool? success, String? scrapedAt, String? cachedAt, Map<String, dynamic>? metrics, List<Map<String, dynamic>>? stations
 });
 
 
@@ -286,14 +290,14 @@ class __$TelemetryRawCopyWithImpl<$Res>
 
 /// Create a copy of TelemetryRaw
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? success = null,Object? scrapedAt = null,Object? cachedAt = null,Object? metrics = null,Object? stations = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? success = freezed,Object? scrapedAt = freezed,Object? cachedAt = freezed,Object? metrics = freezed,Object? stations = freezed,}) {
   return _then(_TelemetryRaw(
-success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
-as bool,scrapedAt: null == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
-as String,cachedAt: null == cachedAt ? _self.cachedAt : cachedAt // ignore: cast_nullable_to_non_nullable
-as String,metrics: null == metrics ? _self._metrics : metrics // ignore: cast_nullable_to_non_nullable
-as Map<String, dynamic>,stations: null == stations ? _self._stations : stations // ignore: cast_nullable_to_non_nullable
-as List<Map<String, dynamic>>,
+success: freezed == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool?,scrapedAt: freezed == scrapedAt ? _self.scrapedAt : scrapedAt // ignore: cast_nullable_to_non_nullable
+as String?,cachedAt: freezed == cachedAt ? _self.cachedAt : cachedAt // ignore: cast_nullable_to_non_nullable
+as String?,metrics: freezed == metrics ? _self._metrics : metrics // ignore: cast_nullable_to_non_nullable
+as Map<String, dynamic>?,stations: freezed == stations ? _self._stations : stations // ignore: cast_nullable_to_non_nullable
+as List<Map<String, dynamic>>?,
   ));
 }
 
