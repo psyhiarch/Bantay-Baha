@@ -4,6 +4,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'station.freezed.dart';
 
+part 'station.g.dart';
+
 @freezed
 abstract class Station with _$Station {
 
@@ -24,4 +26,7 @@ abstract class Station with _$Station {
   required String riskLevel,
   required String lastUpdated,
   }) = _Station;
+
+
+  factory Station.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
 }

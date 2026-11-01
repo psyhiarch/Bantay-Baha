@@ -15,9 +15,7 @@ class FloodApiService {
       Uri.https(_baseUrl, _floodLiveApi),
     );
 
-    final Map<String, dynamic> json = jsonDecode(
-      utf8.decode(response.bodyBytes),
-    );
+    final Map<String, dynamic> json = jsonDecode(response.body);
     return FloodRaw.fromJson(json);
   }
 }

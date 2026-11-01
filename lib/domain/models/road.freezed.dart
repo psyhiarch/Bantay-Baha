@@ -12,6 +12,7 @@ part of 'road.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$Road {
 
@@ -22,6 +23,8 @@ mixin _$Road {
 @pragma('vm:prefer-inline')
 $RoadCopyWith<Road> get copyWith => _$RoadCopyWithImpl<Road>(this as Road, _$identity);
 
+  /// Serializes this Road to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -30,7 +33,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is Road&&(identical(other.roadId, _this.roadId) || other.roadId == _this.roadId)&&(identical(other.roadName, _this.roadName) || other.roadName == _this.roadName)&&const DeepCollectionEquality().equals(other.coordinates, _this.coordinates)&&const DeepCollectionEquality().equals(other.centroid, _this.centroid)&&(identical(other.elevationM, _this.elevationM) || other.elevationM == _this.elevationM)&&(identical(other.elevationMeters, _this.elevationMeters) || other.elevationMeters == _this.elevationMeters)&&(identical(other.noahHazardLevel, _this.noahHazardLevel) || other.noahHazardLevel == _this.noahHazardLevel)&&(identical(other.isFlooded, _this.isFlooded) || other.isFlooded == _this.isFlooded)&&(identical(other.estimatedDepthCm, _this.estimatedDepthCm) || other.estimatedDepthCm == _this.estimatedDepthCm)&&(identical(other.hazardScore, _this.hazardScore) || other.hazardScore == _this.hazardScore)&&(identical(other.severity, _this.severity) || other.severity == _this.severity)&&(identical(other.color, _this.color) || other.color == _this.color)&&(identical(other.depthCategory, _this.depthCategory) || other.depthCategory == _this.depthCategory)&&const DeepCollectionEquality().equals(other.lineWeight, _this.lineWeight)&&const DeepCollectionEquality().equals(other.drivableVehicles, _this.drivableVehicles)&&const DeepCollectionEquality().equals(other.nearestStation, _this.nearestStation)&&(identical(other.isNearRiver, _this.isNearRiver) || other.isNearRiver == _this.isNearRiver)&&(identical(other.nationalRoute, _this.nationalRoute) || other.nationalRoute == _this.nationalRoute)&&(identical(other.roadClassification, _this.roadClassification) || other.roadClassification == _this.roadClassification)&&(identical(other.region, _this.region) || other.region == _this.region)&&(identical(other.description, _this.description) || other.description == _this.description));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Road;
@@ -229,11 +232,11 @@ return $default(_that.roadId,_that.roadName,_that.coordinates,_that.centroid,_th
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _Road implements Road {
   const _Road({required this.roadId, required this.roadName, required  List<List<double>> coordinates, required  List<double> centroid, required this.elevationM, required this.elevationMeters, required this.noahHazardLevel, required this.isFlooded, required this.estimatedDepthCm, required this.hazardScore, required this.severity, required this.color, required this.depthCategory, required this.lineWeight, required  List<String> drivableVehicles, required  Map<String, dynamic> nearestStation, required this.isNearRiver, required this.nationalRoute, required this.roadClassification, required this.region, required this.description}): _coordinates = coordinates,_centroid = centroid,_drivableVehicles = drivableVehicles,_nearestStation = nearestStation;
-  
+  factory _Road.fromJson(Map<String, dynamic> json) => _$RoadFromJson(json);
 
 @override final  String roadId;
 @override final  String roadName;
@@ -287,14 +290,17 @@ class _Road implements Road {
 @pragma('vm:prefer-inline')
 _$RoadCopyWith<_Road> get copyWith => __$RoadCopyWithImpl<_Road>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$RoadToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _Road&&(identical(other.roadId, roadId) || other.roadId == roadId)&&(identical(other.roadName, roadName) || other.roadName == roadName)&&const DeepCollectionEquality().equals(other.coordinates, _coordinates)&&const DeepCollectionEquality().equals(other.centroid, _centroid)&&(identical(other.elevationM, elevationM) || other.elevationM == elevationM)&&(identical(other.elevationMeters, elevationMeters) || other.elevationMeters == elevationMeters)&&(identical(other.noahHazardLevel, noahHazardLevel) || other.noahHazardLevel == noahHazardLevel)&&(identical(other.isFlooded, isFlooded) || other.isFlooded == isFlooded)&&(identical(other.estimatedDepthCm, estimatedDepthCm) || other.estimatedDepthCm == estimatedDepthCm)&&(identical(other.hazardScore, hazardScore) || other.hazardScore == hazardScore)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.color, color) || other.color == color)&&(identical(other.depthCategory, depthCategory) || other.depthCategory == depthCategory)&&const DeepCollectionEquality().equals(other.lineWeight, lineWeight)&&const DeepCollectionEquality().equals(other.drivableVehicles, _drivableVehicles)&&const DeepCollectionEquality().equals(other.nearestStation, _nearestStation)&&(identical(other.isNearRiver, isNearRiver) || other.isNearRiver == isNearRiver)&&(identical(other.nationalRoute, nationalRoute) || other.nationalRoute == nationalRoute)&&(identical(other.roadClassification, roadClassification) || other.roadClassification == roadClassification)&&(identical(other.region, region) || other.region == region)&&(identical(other.description, description) || other.description == description));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hashAll([runtimeType,roadId,roadName,const DeepCollectionEquality().hash(_coordinates),const DeepCollectionEquality().hash(_centroid),elevationM,elevationMeters,noahHazardLevel,isFlooded,estimatedDepthCm,hazardScore,severity,color,depthCategory,const DeepCollectionEquality().hash(lineWeight),const DeepCollectionEquality().hash(_drivableVehicles),const DeepCollectionEquality().hash(_nearestStation),isNearRiver,nationalRoute,roadClassification,region,description]);

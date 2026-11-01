@@ -22,10 +22,5 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   MapLibreMap.preWarm();
   setupLocator();
-  runApp(
-    MultiProvider(
-      providers: [ChangeNotifierProvider.value(value: getIt<HomeViewModel>())],
-      child: MaterialApp.router(routerConfig: _goRouter),
-    ),
-  );
+  runApp(MaterialApp.router(routerConfig: _goRouter));
 }

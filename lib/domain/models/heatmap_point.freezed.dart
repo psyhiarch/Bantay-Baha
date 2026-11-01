@@ -12,6 +12,7 @@ part of 'heatmap_point.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
+
 /// @nodoc
 mixin _$HeatmapPoint {
 
@@ -22,6 +23,8 @@ mixin _$HeatmapPoint {
 @pragma('vm:prefer-inline')
 $HeatmapPointCopyWith<HeatmapPoint> get copyWith => _$HeatmapPointCopyWithImpl<HeatmapPoint>(this as HeatmapPoint, _$identity);
 
+  /// Serializes this HeatmapPoint to a JSON map.
+  Map<String, dynamic> toJson();
 
 
 @override
@@ -30,7 +33,7 @@ bool operator ==(Object other) {
   return identical(this, other) || (other.runtimeType == runtimeType&&other is HeatmapPoint&&(identical(other.lat, _this.lat) || other.lat == _this.lat)&&(identical(other.lng, _this.lng) || other.lng == _this.lng)&&(identical(other.intensity, _this.intensity) || other.intensity == _this.intensity)&&(identical(other.depthCm, _this.depthCm) || other.depthCm == _this.depthCm)&&(identical(other.category, _this.category) || other.category == _this.category)&&(identical(other.radius, _this.radius) || other.radius == _this.radius)&&(identical(other.isFlooded, _this.isFlooded) || other.isFlooded == _this.isFlooded));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as HeatmapPoint;
@@ -215,11 +218,11 @@ return $default(_that.lat,_that.lng,_that.intensity,_that.depthCm,_that.category
 }
 
 /// @nodoc
-
+@JsonSerializable()
 
 class _HeatmapPoint implements HeatmapPoint {
   const _HeatmapPoint({required this.lat, required this.lng, required this.intensity, required this.depthCm, required this.category, required this.radius, required this.isFlooded});
-  
+  factory _HeatmapPoint.fromJson(Map<String, dynamic> json) => _$HeatmapPointFromJson(json);
 
 @override final  double lat;
 @override final  double lng;
@@ -235,14 +238,17 @@ class _HeatmapPoint implements HeatmapPoint {
 @pragma('vm:prefer-inline')
 _$HeatmapPointCopyWith<_HeatmapPoint> get copyWith => __$HeatmapPointCopyWithImpl<_HeatmapPoint>(this, _$identity);
 
-
+@override
+Map<String, dynamic> toJson() {
+  return _$HeatmapPointToJson(this, );
+}
 
 @override
 bool operator ==(Object other) {
     return identical(this, other) || (other.runtimeType == runtimeType&&other is _HeatmapPoint&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.intensity, intensity) || other.intensity == intensity)&&(identical(other.depthCm, depthCm) || other.depthCm == depthCm)&&(identical(other.category, category) || other.category == category)&&(identical(other.radius, radius) || other.radius == radius)&&(identical(other.isFlooded, isFlooded) || other.isFlooded == isFlooded));
 }
 
-
+@JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
     return Object.hash(runtimeType,lat,lng,intensity,depthCm,category,radius,isFlooded);
