@@ -1,4 +1,4 @@
-import 'package:bantay_baha/app/locator.dart';
+import 'package:bantay_baha/core/locator.dart';
 import 'package:bantay_baha/shell_scaffold.dart';
 import 'package:bantay_baha/ui/home/home_view.dart';
 import 'package:bantay_baha/ui/home/home_viewmodel.dart';

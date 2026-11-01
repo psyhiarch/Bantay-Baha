@@ -1,4 +1,4 @@
-import 'package:bantay_baha/app/mapper.dart';
+import 'package:bantay_baha/core/mapper.dart';
 import 'package:bantay_baha/data/models/flood_raw.dart';
 import 'package:bantay_baha/data/services/flood_api_service.dart';
 import 'package:bantay_baha/domain/models/flood.dart';
