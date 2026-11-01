@@ -8,15 +8,15 @@ A Huge Thanks and Credits to [haliknihudas666](https://github.com/haliknihudas66
 
 ## Architecture and Project Structure
 
-This Project uses Stack architecture 
+This Project uses MVVM architecture 
 
 ### State management
 | Ephemeral State | App State | App Wide Services |
 |-----------------|-----------|-------------------|
-|setState | ValueNotifier | Locator/Service Locator|
+|setState | ChangeNotifier | Locator/Service Locator|
 
 
-view - ValueListenableBuilder <-> viewmodel - ValueNotifier (app state) 
+view - ValueListenableBuilder <-> viewmodel - ChangeNotifier (app state) 
 
 ### Project Structure
 
