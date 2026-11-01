@@ -28,5 +28,5 @@ abstract class Station with _$Station {
   }) = _Station;
 
 
-  factory Station.fromJson(Map<String, dynamic> json) => _$MetricsFromJson(json);
+  factory Station.fromJson(Map<String, dynamic> json) => _$StationFromJson(json);
 }
