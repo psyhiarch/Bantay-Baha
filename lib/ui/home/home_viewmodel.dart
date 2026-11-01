@@ -11,5 +11,10 @@ class HomeViewModel extends ChangeNotifier {
 
   HomeViewModel(this._floodRepository);
 
+
+  void test() async {
+    await _floodRepository.getFloodLive();
+  }
+
 }
 

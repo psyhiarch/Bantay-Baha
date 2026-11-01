@@ -22,9 +22,9 @@ abstract class Station with _$Station {
   required double waterLevel,
   required double waterLevelDelta1h,
   required String waterRiskLevel,
-  required String rainRistLevel,
+  required String rainRiskLevel,
   required String riskLevel,
-  required String lastUpdated,
+  required DateTime lastUpdated,
   }) = _Station;
 
 

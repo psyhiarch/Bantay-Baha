@@ -18,9 +18,9 @@ _Station _$StationFromJson(Map<String, dynamic> json) => _Station(
   waterLevel: (json['waterLevel'] as num).toDouble(),
   waterLevelDelta1h: (json['waterLevelDelta1h'] as num).toDouble(),
   waterRiskLevel: json['waterRiskLevel'] as String,
-  rainRistLevel: json['rainRistLevel'] as String,
+  rainRiskLevel: json['rainRiskLevel'] as String,
   riskLevel: json['riskLevel'] as String,
-  lastUpdated: json['lastUpdated'] as String,
+  lastUpdated: DateTime.parse(json['lastUpdated'] as String),
 );
 
 Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
@@ -35,7 +35,7 @@ Map<String, dynamic> _$StationToJson(_Station instance) => <String, dynamic>{
   'waterLevel': instance.waterLevel,
   'waterLevelDelta1h': instance.waterLevelDelta1h,
   'waterRiskLevel': instance.waterRiskLevel,
-  'rainRistLevel': instance.rainRistLevel,
+  'rainRiskLevel': instance.rainRiskLevel,
   'riskLevel': instance.riskLevel,
-  'lastUpdated': instance.lastUpdated,
+  'lastUpdated': instance.lastUpdated.toIso8601String(),
 };

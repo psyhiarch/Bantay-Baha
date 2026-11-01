@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class FloodApiService {
   const FloodApiService();
 
-  final String _baseUrl = 'https://bahaba.nicolei.games';
+  final String _baseUrl = 'bahaba.nicolei.games';
   final String _floodLiveApi = '/api/flood/live';
 
   Future<FloodRaw> fetchFloodLive() async {

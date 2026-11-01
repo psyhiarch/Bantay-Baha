@@ -13,7 +13,6 @@ class FloodRepositoryImpl implements FloodRepository {
   Future<Flood> getFloodLive() async {
     final FloodRaw floodRaw = await _floodApiService.fetchFloodLive();
     final Flood flood = floodRaw.toDomain();
-    print(flood);
     return flood;
   }
 }
