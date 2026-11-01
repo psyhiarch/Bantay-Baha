@@ -1,5 +1,3 @@
-import 'package:bantay_baha/domain/models/flood.dart';
-import 'package:bantay_baha/domain/models/metrics.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'flood_raw.freezed.dart';

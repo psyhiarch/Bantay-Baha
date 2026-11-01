@@ -1,61 +1,139 @@
-# Bantay Baha
+# Bantay-Baha
 
-A Real-Time Flood Monitoring System
+A real-time flood monitoring app built with Flutter and MapLibre. It pulls live flood station data from the Bahaba API, displays station markers on a map, and lets users inspect rainfall, water level, and risk categories for each station.
 
-## Credits
+## Overview
 
-A Huge Thanks and Credits to [haliknihudas666](https://github.com/haliknihudas666) and his project [bahaba](https://github.com/haliknihudas666/bahaba) for the api in this app.
+Bantay-Baha is designed for quick situational awareness during flood events. The app shows:
 
-## Architecture and Project Structure
+- live flood station locations on a map
+- station risk levels (`NORMAL`, `WARNING`, `ALARM`, `CRITICAL`)
+- rainfall data for 10-minute, 1-hour, and 24-hour windows
+- water level and 1-hour change
+- a bottom sheet with detailed station metrics
+- auto-refresh and manual refresh support
 
-This Project uses MVVM architecture 
+## Features
 
-### State management
-| Ephemeral State | App State | App Wide Services |
-|-----------------|-----------|-------------------|
-|setState | ChangeNotifier | Locator/Service Locator|
+- Real-time flood monitoring using the Bahaba API
+- Interactive map with MapLibre GL
+- Animated pulse markers for flood stations
+- Risk-based color coding for each station
+- Tap a station to view detailed readings
+- Auto-refresh every 5 minutes
+- Fresh data loaded from the live endpoint
 
-### Project Structure
+## Tech stack
 
-| Folder/file |	Responsibility |
-|-------------|----------------|
-|app/ |	App configuration, navigation, dependency registration|
-|models/ | Data structures such as FloodReading|
-|services/ |	API requests, database access, authentication|
-|ui/views/ |	Screens and their ViewModels|
-|ui/views/home/widgets/ |	Components used specifically by the Home screen|
-|ui/widgets/common/	| Reusable UI components|
-|test/ |	Unit tests for ViewModels and services|
-|main.dart |	Application entry point|
+- Flutter
+- Dart
+- MapLibre GL for map rendering
+- HTTP for API requests
 
+## Project structure
 
-## RoadMap
-- [x] Display leaflets from the api
-  - [x] Parsing
-- [x] Auto Reaload on interval
-- [ ] Refactor codebase to stack architecture
-- [ ] Telemetry Dashboard
-- [ ] Geocoding for searching places
+```text
+.
+├── lib/
+│   ├── main.dart
+│   └── ui/
+│       └── views/
+│           └── home/
+│               └── home_view.dart
+├── test/
+│   └── widget_test.dart
+├── android/
+├── ios/
+├── linux/
+├── macos/
+├── windows/
+├── web/
+├── analysis_options.yaml
+├── pubspec.yaml
+├── README.md
+└── .metadata
+```
 
-## Getting Started
+## Important implementation notes
 
-- Grab deps
+The current project follows a simple UI-first architecture for a small app:
+
+- `main.dart` starts the app and initializes MapLibre pre-warming
+- `lib/ui/views/home/home_view.dart` contains the main flood-monitoring view
+- the screen is responsible for:
+  - fetching station data
+  - parsing the API response
+  - converting data to GeoJSON
+  - creating map layers
+  - animating pulse markers
+  - showing station details in a bottom sheet
+
+This is a practical prototype architecture, and it can be refactored into a cleaner layered structure later if the project grows.
+
+## API source
+
+The app uses the live flood station API:
+
+```text
+https://bahaba.nicolei.games/api/flood/live
+```
+
+The app validates the response shape and filters out invalid coordinates before plotting markers.
+
+## Getting started
+
+### Prerequisites
+
+- Flutter SDK
+- Android Studio / Xcode / VS Code depending on platform
+
+### Install dependencies
+
 ```bash
 flutter pub get
 ```
 
-- Running
+### Run the app
+
 ```bash
 flutter run
 ```
 
-A few resources to get you started if this is your first Flutter project:
+### Run tests
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter test
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Environment
 
+The project currently targets the Flutter SDK version declared in `pubspec.yaml`:
+
+```yaml
+environment:
+  sdk: ^3.13.4
+```
+
+## Roadmap
+
+- [x] Display flood stations from the API
+- [x] Parse and validate live readings
+- [x] Auto-refresh on interval
+- [x] Show map-based station markers
+- [x] Show station detail sheet
+- [ ] Refactor into a cleaner architecture
+- [ ] Add a telemetry dashboard
+- [ ] Add geocoding/search for places
+- [ ] Add production-grade tests for the monitoring flow
+
+## Credits
+
+This project is based on data from the Bahaba flood API and was inspired by the work of the Bahaba project by [haliknihudas666](https://github.com/haliknihudas666).
+
+## License
+
+This project does not currently declare a license in the repository metadata.
+
+## Notes
+
+Bantay-Baha is a practical flood monitoring prototype focused on real-time awareness and quick inspection of flood conditions. It is useful as a starting point for a larger disaster-response or environmental monitoring application.

@@ -1,6 +1,5 @@
 
 
-import 'package:bantay_baha/domain/models/coordinates.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'location_pin_raw.freezed.dart';
