@@ -16,12 +16,10 @@ class HomeViewModel extends ChangeNotifier {
   final StationHistoryService _stationHistoryService;
 
   HomeViewModel({
-    required FloodRepository floodRepository,
-    required LocalNotificationService notificationService,
-    required StationHistoryService stationHistoryService,
-  }) : _floodRepository = floodRepository,
-       _notificationService = notificationService,
-       _stationHistoryService = stationHistoryService;
+    required this._floodRepository,
+    required this._notificationService,
+    required this._stationHistoryService,
+  });
 
   Flood? _flood;
   List<Advisory> _advisories = const [];
@@ -32,7 +30,8 @@ class HomeViewModel extends ChangeNotifier {
   Map<String, List<StationReading>> _stationHistory = {};
   Set<String> _watchedStationIds = {};
   Set<String> get watchedStationIds => Set.unmodifiable(_watchedStationIds);
-  bool isStationWatched(String stationId) => _watchedStationIds.contains(stationId);
+  bool isStationWatched(String stationId) =>
+      _watchedStationIds.contains(stationId);
 
   Future<void> toggleStationWatch(String stationId) async {
     final watched = !_watchedStationIds.contains(stationId);
@@ -44,6 +43,7 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
     await _notificationService.setStationWatched(stationId, watched);
   }
+
   late final UnmodifiableListView<Station> _stationsView = UnmodifiableListView(
     _stations,
   );
@@ -54,7 +54,8 @@ class HomeViewModel extends ChangeNotifier {
   bool get isUsingCachedFloodData => _floodRepository.isUsingCachedFloodData;
   bool get isUsingCachedAdvisories => _floodRepository.isUsingCachedAdvisories;
   DateTime? get floodCacheSavedAt => _floodRepository.floodCacheSavedAt;
-  DateTime? get advisoriesCacheSavedAt => _floodRepository.advisoriesCacheSavedAt;
+  DateTime? get advisoriesCacheSavedAt =>
+      _floodRepository.advisoriesCacheSavedAt;
   Metrics? get metrics => _metrics;
   UnmodifiableListView<Station> get stations => _stationsView;
   List<StationReading> historyFor(String stationId) =>
@@ -103,7 +104,7 @@ class HomeViewModel extends ChangeNotifier {
         ..addAll(result.stations);
       _metrics = result.metrics;
       if (!_floodRepository.isUsingCachedFloodData) {
-        await _notificationService.notifyWatchedStationChanges(result.stations);
+        //await _notificationService.notifyWatchedStationChanges(result.stations);
         try {
           _stationHistory = await _stationHistoryService.record(
             result.stations,
@@ -113,17 +114,19 @@ class HomeViewModel extends ChangeNotifier {
           debugPrint('Station history could not be saved: $error');
         }
 
-        for (final station in result.stations) {
-          final level = station.riskLevel.toLowerCase();
-          if (level.contains('high') || level.contains('severe') || level.contains('critical')) {
-            await _notificationService.notifyEarlyWarning(
-              stationId: station.stationId,
-              stationName: station.stationName,
-              riskLevel: station.riskLevel,
-              waterLevel: station.waterLevel,
-            );
-          }
-        }
+        // for (final station in result.stations) {
+        //   final level = station.riskLevel.toLowerCase();
+        //   if (level.contains('high') ||
+        //       level.contains('severe') ||
+        //       level.contains('critical')) {
+        //     await _notificationService.notifyEarlyWarning(
+        //       stationId: station.stationId,
+        //       stationName: station.stationName,
+        //       riskLevel: station.riskLevel,
+        //       waterLevel: station.waterLevel,
+        //     );
+        //   }
+        // }
       }
 
       _floodError = null;
@@ -154,9 +157,9 @@ class HomeViewModel extends ChangeNotifier {
     try {
       final result = await _floodRepository.getAdvisories();
       if (result == null) throw Exception('Advisories are unavailable.');
-      if (!_floodRepository.isUsingCachedAdvisories) {
-        await _notificationService.notifyNewAdvisories(result);
-      }
+      // if (!_floodRepository.isUsingCachedAdvisories) {
+      //   await _notificationService.notifyNewAdvisories(result);
+      // }
       _advisories = result;
     } catch (error) {
       debugPrint('Advisory loading error: $error');

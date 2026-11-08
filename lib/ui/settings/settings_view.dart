@@ -1,4 +1,5 @@
 import 'package:bantay_baha/core/locator.dart';
+import 'package:bantay_baha/data/services/background_service.dart';
 import 'package:bantay_baha/data/services/local_notification_service.dart';
 import 'package:bantay_baha/ui/theme/app_theme_controller.dart';
 import 'package:flutter/material.dart';
@@ -38,24 +39,29 @@ class _SettingsViewState extends State<SettingsView> {
 
   Future<void> _setEnabled(bool enabled) async {
     if (enabled) {
+      late final bool granted;
       try {
-        final granted = await _notifications.enableNotifications();
-        if (!mounted) return;
-        setState(() => _enabled = granted);
-        if (!granted) _showPermissionHint();
+        granted = await _notifications.enableNotifications();
       } on PlatformException {
         if (mounted) _showPermissionHint();
+        return;
       }
+      if (mounted) setState(() => _enabled = granted);
+      if (granted) await schedulePeriodicTask();
+      if (!granted && mounted) _showPermissionHint();
       return;
     }
 
     await _notifications.disableNotifications();
     if (mounted) setState(() => _enabled = false);
+    await cancelRecurringJob();
   }
 
   void _showPermissionHint() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Allow notifications in your device settings.')),
+      const SnackBar(
+        content: Text('Allow notifications in your device settings.'),
+      ),
     );
   }
 
@@ -95,7 +101,9 @@ class _SettingsViewState extends State<SettingsView> {
           ListTile(
             leading: const Icon(Icons.warning_amber_rounded),
             title: const Text('Watched station alert level'),
-            subtitle: const Text('Notify when a watched station reaches this risk level'),
+            subtitle: const Text(
+              'Notify when a watched station reaches this risk level',
+            ),
             trailing: DropdownButton<int>(
               value: _watchThreshold,
               onChanged: _loading

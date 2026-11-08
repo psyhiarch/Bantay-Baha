@@ -1,6 +1,6 @@
 import 'package:bantay_baha/core/locator.dart';
+import 'package:bantay_baha/data/services/background_service.dart';
 import 'package:bantay_baha/data/services/local_notification_service.dart';
-import 'package:bantay_baha/shell_scaffold.dart';
 import 'package:bantay_baha/ui/advisories/advisories_view.dart';
 import 'package:bantay_baha/ui/home/home_view.dart';
 import 'package:bantay_baha/ui/home/home_viewmodel.dart';
@@ -88,15 +88,16 @@ GoRouter _goRouter = GoRouter(
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const SettingsView(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1.0, 0.0),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              );
-            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
           ),
         ),
       ],
@@ -130,13 +131,15 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MapLibreMap.preWarm();
   setupLocator();
-  await getIt<LocalNotificationService>().initialize();
+  final notificationService = getIt<LocalNotificationService>();
+  await notificationService.initialize();
   final themeController = getIt<AppThemeController>();
   await themeController.load();
+  await initializeBackgroundAlerts();
+  if (await notificationService.notificationsEnabled()) {
+    await schedulePeriodicTask();
+  }
   runApp(
-    ChangeNotifierProvider.value(
-      value: themeController,
-      child: const MyApp(),
-    ),
+    ChangeNotifierProvider.value(value: themeController, child: const MyApp()),
   );
 }

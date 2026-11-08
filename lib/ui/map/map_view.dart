@@ -61,7 +61,7 @@ class MapView extends StatefulWidget {
   State<MapView> createState() => _MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class _MapViewState extends State<MapView> with WidgetsBindingObserver {
   static const String _stationSourceId = 'flood-stations-source';
   static const String _pulseLayerId = 'flood-stations-pulse';
   static const String _selectedPulseLayerId = 'flood-stations-selected-pulse';
@@ -80,7 +80,15 @@ class _MapViewState extends State<MapView> {
   static const String _routeDestinationLayerId = 'route-destination-marker';
 
   MapLibreMapController? _controller;
-  Station? _selectedStation;
+
+  /// Only the id is stored. The Station itself is looked up from the
+  /// ViewModel on every build, so the card never shows stale readings.
+  String? _selectedStationId;
+
+  /// The requested station id (from the route) that we've already focused.
+  /// This is what stops the card from re-opening after the user closes it.
+  String? _handledRequestedStationId;
+
   String? _stationSignature;
   String? _reportSignature;
   String? _roadSignature;
@@ -107,12 +115,44 @@ class _MapViewState extends State<MapView> {
   bool _returnToRoutePlannerAfterMapPick = false;
   bool _isFetchingLocation = false;
   int _routeRequestId = 0;
-  final RoutePlanningService _routePlanningService = const RoutePlanningService();
+  final RoutePlanningService _routePlanningService =
+      const RoutePlanningService();
   bool _hasFramedStations = false;
   bool _pulseUpdatePending = false;
   double _pulseProgress = 0;
   bool _pulseExpanding = true;
   Timer? _pulseTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didUpdateWidget(covariant MapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // A different station was requested (e.g. the user went back to the
+    // overview and tapped another card). Allow it to be focused again.
+    if (oldWidget.selectedStationId != widget.selectedStationId) {
+      _handledRequestedStationId = null;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Don't burn battery pulsing markers while the app isn't visible.
+    if (state == AppLifecycleState.resumed) {
+      if (!mounted || !_layersReady) return;
+      final hasStations = context.read<HomeViewModel>().stations.any(
+        _hasValidCoordinates,
+      );
+      if (hasStations) _startPulseAnimation();
+    } else {
+      _pulseTimer?.cancel();
+      _pulseTimer = null;
+    }
+  }
 
   void _onStationFeatureTapped(
     Point<double> point,
@@ -124,7 +164,8 @@ class _MapViewState extends State<MapView> {
     if (_routePickStep > 0) return;
     if (layerId == _plannedRouteLayerId) return;
     if (layerId == _roadLayerId) {
-      for (final road in context.read<HomeViewModel>().flood?.roads ?? const <Road>[]) {
+      for (final road
+          in context.read<HomeViewModel>().flood?.roads ?? const <Road>[]) {
         if ('route:${road.roadId}' == featureId) {
           _showRoadDetails(road);
           return;
@@ -143,6 +184,8 @@ class _MapViewState extends State<MapView> {
       }
       return;
     }
+    // Tapping a marker shows the station card. The card's "Details" button
+    // opens the full sheet, so we don't stack two popups.
     _selectStation(featureId);
   }
 
@@ -155,12 +198,10 @@ class _MapViewState extends State<MapView> {
         model.advisories.isNotEmpty ||
         (model.flood?.roads.isNotEmpty ?? false);
     final showMapLegend = _showStationOverview && hasOverviewData;
-    final selectedStation = _selectedStation;
+    final selectedStation = _stationById(stations, _selectedStationId);
+    // The station card is independent of the overview (legend) toggle.
     final showSelectedStation =
-        _showStationOverview &&
-        !_routePickerOpen &&
-        _routePickStep == 0 &&
-        selectedStation != null;
+        !_routePickerOpen && _routePickStep == 0 && selectedStation != null;
     _scheduleAnnotationSync(stations);
     _scheduleReportSync(model.advisories);
     _scheduleRoadSync(model.flood?.roads ?? const <Road>[]);
@@ -178,11 +219,10 @@ class _MapViewState extends State<MapView> {
           actions: [
             IconButton(
               tooltip: _showStationOverview
-                  ? 'Hide station overview'
-                  : 'Show station overview',
-              onPressed: () => setState(
-                () => _showStationOverview = !_showStationOverview,
-              ),
+                  ? 'Hide map legend'
+                  : 'Show map legend',
+              onPressed: () =>
+                  setState(() => _showStationOverview = !_showStationOverview),
               icon: Icon(
                 _showStationOverview
                     ? Icons.visibility_off_outlined
@@ -222,7 +262,8 @@ class _MapViewState extends State<MapView> {
                     _initializeStationLayers();
                   },
                   featureTapsTriggersMapClick: true,
-                  onMapClick: (_, coordinates) => _handleRouteMapClick(coordinates),
+                  onMapClick: (_, coordinates) =>
+                      _handleRouteMapClick(coordinates),
                   scrollGesturesEnabled: true,
                   zoomGesturesEnabled: true,
                   rotateGesturesEnabled: true,
@@ -274,65 +315,69 @@ class _MapViewState extends State<MapView> {
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 250),
                           child: Row(
-                          children: [
-                            if (_routePickStep == 3) ...[
-                              const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                            children: [
+                              if (_routePickStep == 3) ...[
+                                const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                const SizedBox(width: 9),
+                              ] else ...[
+                                Icon(
+                                  _routeError != null
+                                      ? Icons.error_outline_rounded
+                                      : _plannedRoute != null
+                                      ? Icons.alt_route_rounded
+                                      : Icons.touch_app_outlined,
+                                  color: _routeError != null
+                                      ? Theme.of(context).colorScheme.error
+                                      : Theme.of(context).colorScheme.primary,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 9),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  _routePickStep == 1
+                                      ? 'Tap map to choose a start'
+                                      : _routePickStep == 2
+                                      ? 'Tap map to choose a destination'
+                                      : _routePickStep == 3
+                                      ? 'Finding a route…'
+                                      : _routeError ??
+                                            'Route ready · ${_distanceLabel(_plannedRoute!.distanceMeters)}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.labelLarge
+                                      ?.copyWith(
+                                        color: _routeError != null
+                                            ? Theme.of(context)
+                                                  .colorScheme
+                                                  .error
+                                            : null,
+                                      ),
+                                ),
                               ),
-                              const SizedBox(width: 9),
-                            ] else ...[
-                              Icon(
-                                _routeError != null
-                                    ? Icons.error_outline_rounded
-                                    : _plannedRoute != null
-                                    ? Icons.alt_route_rounded
-                                    : Icons.touch_app_outlined,
-                                color: _routeError != null
-                                    ? Theme.of(context).colorScheme.error
-                                    : Theme.of(context).colorScheme.primary,
-                                size: 18,
+                              IconButton(
+                                tooltip: _routePickStep > 0
+                                    ? 'Cancel route planning'
+                                    : _routeError != null
+                                    ? 'Open route planner'
+                                    : 'Open route details',
+                                visualDensity: VisualDensity.compact,
+                                onPressed: _routePickStep > 0
+                                    ? _cancelRoutePlanning
+                                    : _toggleRoutePicker,
+                                icon: Icon(
+                                  _routePickStep > 0
+                                      ? Icons.close_rounded
+                                      : Icons.open_in_new_rounded,
+                                ),
                               ),
-                              const SizedBox(width: 9),
                             ],
-                            Expanded(
-                              child: Text(
-                                _routePickStep == 1
-                                    ? 'Tap map to choose a start'
-                                    : _routePickStep == 2
-                                    ? 'Tap map to choose a destination'
-                                    : _routePickStep == 3
-                                    ? 'Finding a route…'
-                                    : _routeError ??
-                                        'Route ready · ${_distanceLabel(_plannedRoute!.distanceMeters)}',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.labelLarge
-                                    ?.copyWith(
-                                      color: _routeError != null
-                                          ? Theme.of(context).colorScheme.error
-                                          : null,
-                                    ),
-                              ),
-                            ),
-                            IconButton(
-                              tooltip: _routePickStep > 0
-                                  ? 'Cancel route planning'
-                                  : _routeError != null
-                                  ? 'Open route planner'
-                                  : 'Open route details',
-                              visualDensity: VisualDensity.compact,
-                              onPressed: _routePickStep > 0
-                                  ? _cancelRoutePlanning
-                                  : _toggleRoutePicker,
-                              icon: Icon(
-                                _routePickStep > 0
-                                    ? Icons.close_rounded
-                                    : Icons.open_in_new_rounded,
-                              ),
-                            ),
-                          ],
                           ),
                         ),
                       ),
@@ -349,11 +394,10 @@ class _MapViewState extends State<MapView> {
                       children: [
                         if (showSelectedStation)
                           _SelectedStationCard(
-                            station: selectedStation!,
-                            onClose: () =>
-                                setState(() => _selectedStation = null),
+                            station: selectedStation,
+                            onClose: _clearSelection,
                             onDetails: () =>
-                                _showStationDetails(selectedStation!),
+                                _showStationDetails(selectedStation),
                           ),
                         if (showSelectedStation && showMapLegend)
                           const SizedBox(height: 8),
@@ -362,18 +406,19 @@ class _MapViewState extends State<MapView> {
                             alignment: Alignment.centerLeft,
                             child: _MapLegend(
                               count: stations.length,
-                              reportCount: _roadReports(
-                                model.advisories,
-                              ).length,
+                              reportCount: _roadReports(model.advisories)
+                                  .length,
                               roadCount: _validRoads(
                                 model.flood?.roads ?? const <Road>[],
                               ).length,
                               showRoads: _showHazardRoads,
                               onRoadVisibilityChanged: _setRoadVisibility,
-                              isOffline: model.isUsingCachedFloodData ||
+                              isOffline:
+                                  model.isUsingCachedFloodData ||
                                   model.isUsingCachedAdvisories ||
                                   model.hasFloodError,
-                              savedAt: model.floodCacheSavedAt ??
+                              savedAt:
+                                  model.floodCacheSavedAt ??
                                   model.advisoriesCacheSavedAt,
                             ),
                           ),
@@ -388,44 +433,56 @@ class _MapViewState extends State<MapView> {
     );
   }
 
+  Station? _stationById(Iterable<Station> stations, String? id) {
+    if (id == null) return null;
+    for (final station in stations) {
+      if (station.stationId == id) return station;
+    }
+    return null;
+  }
+
+  /// Focuses the station requested through the route, exactly once.
   void _selectRequestedStation(List<Station> stations) {
     final id = widget.selectedStationId;
     if (id == null ||
-        _selectedStation?.stationId == id ||
+        id == _handledRequestedStationId ||
         _controller == null ||
         !_layersReady) {
       return;
     }
-    for (final station in stations) {
-      if (station.stationId == id) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _selectStation(id, showDetails: false);
-        });
-        return;
-      }
-    }
+    final station = _stationById(stations, id);
+    // Data may still be loading; a later build will retry.
+    if (station == null || !_hasValidCoordinates(station)) return;
+
+    // Marked synchronously so repeated builds can't queue duplicates, and so
+    // closing the card later doesn't bring it back.
+    _handledRequestedStationId = id;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selectStation(id);
+    });
   }
 
-  void _selectStation(String stationId, {bool showDetails = true}) {
-    Station? station;
-    for (final item in context.read<HomeViewModel>().stations) {
-      if (item.stationId == stationId) {
-        station = item;
-        break;
-      }
-    }
-    final selectedStation = station;
-    if (selectedStation == null || !mounted) return;
-    setState(() => _selectedStation = selectedStation);
+  void _selectStation(String stationId, {bool showDetails = false}) {
+    final station = _stationById(
+      context.read<HomeViewModel>().stations,
+      stationId,
+    );
+    if (station == null || !_hasValidCoordinates(station) || !mounted) return;
+    setState(() => _selectedStationId = stationId);
     if (widget.selectedStationId == stationId) _hasFramedStations = true;
     _controller?.animateCamera(
       CameraUpdate.newLatLngZoom(
-        LatLng(selectedStation.latitude, selectedStation.longitude),
+        LatLng(station.latitude, station.longitude),
         12,
       ),
       duration: const Duration(milliseconds: 500),
     );
-    if (showDetails) _showStationDetails(selectedStation);
+    if (showDetails) _showStationDetails(station);
+  }
+
+  void _clearSelection() {
+    if (_selectedStationId == null) return;
+    setState(() => _selectedStationId = null);
   }
 
   Future<void> _setRoadVisibility(bool visible) async {
@@ -682,7 +739,10 @@ class _MapViewState extends State<MapView> {
       if (mounted) setState(() => _locationError = error.message);
     } catch (error) {
       if (mounted) {
-        setState(() => _locationError = 'Could not get your location. Try again or search for a place.');
+        setState(
+          () => _locationError =
+              'Could not get your location. Try again or search for a place.',
+        );
       }
       debugPrint('Unable to get current location: $error');
     } finally {
@@ -752,7 +812,9 @@ class _MapViewState extends State<MapView> {
     final start = _routeStart;
     final destination = _routeDestination;
     if (start == null || destination == null) {
-      setState(() => _routeError = 'Choose both a start and a destination first.');
+      setState(
+        () => _routeError = 'Choose both a start and a destination first.',
+      );
       return;
     }
     final model = context.read<HomeViewModel>();
@@ -782,8 +844,8 @@ class _MapViewState extends State<MapView> {
         _plannedRoute = route;
         _routeError = route == null
             ? candidates.isEmpty
-                ? 'No route was returned for those points. Try different locations.'
-                : 'Every available route crosses a road marked impassable.'
+                  ? 'No route was returned for those points. Try different locations.'
+                  : 'Every available route crosses a road marked impassable.'
             : null;
       });
       if (route != null) await _showPlannedRoute(route);
@@ -849,13 +911,8 @@ class _MapViewState extends State<MapView> {
         _annotationSyncRunning) {
       return;
     }
-    final signature = stations
-        .map(
-          (station) =>
-              '${station.stationId}:${station.latitude}:${station.longitude}:${station.riskLevel}',
-        )
-        .join('|') +
-        '|selected:${_selectedStation?.stationId ?? ''}';
+    final signature =
+        '${stations.map((station) => '${station.stationId}:${station.latitude}:${station.longitude}:${station.riskLevel}').join('|')}|selected:${_selectedStationId ?? ''}';
     if (signature == _stationSignature) return;
     _stationSignature = signature;
     _annotationSyncPending = true;
@@ -870,9 +927,9 @@ class _MapViewState extends State<MapView> {
     if (controller == null || !_layersReady || _annotationSyncRunning) return;
     _annotationSyncRunning = true;
     final validStations = stations.where(_hasValidCoordinates).toList();
-    final reportPoints = _roadReports(
-      context.read<HomeViewModel>().advisories,
-    ).map((report) => LatLng(report.latitude, report.longitude)).toList();
+    final reportPoints = _roadReports(context.read<HomeViewModel>().advisories)
+        .map((report) => LatLng(report.latitude, report.longitude))
+        .toList();
     try {
       await controller.setGeoJsonSource(
         _stationSourceId,
@@ -884,17 +941,20 @@ class _MapViewState extends State<MapView> {
       } else {
         _startPulseAnimation();
       }
+
+      // If a specific station was requested, don't also frame the whole
+      // network: that would fight with (and undo) the focus animation.
+      final focusRequested =
+          _stationById(validStations, widget.selectedStationId) != null;
       if (!_hasFramedStations &&
+          !focusRequested &&
           (validStations.isNotEmpty || reportPoints.isNotEmpty)) {
-        await _frameMap(
-          controller,
-          [
-            ...validStations.map(
-              (station) => LatLng(station.latitude, station.longitude),
-            ),
-            ...reportPoints,
-          ],
-        );
+        await _frameMap(controller, [
+          ...validStations.map(
+            (station) => LatLng(station.latitude, station.longitude),
+          ),
+          ...reportPoints,
+        ]);
         _hasFramedStations = true;
       }
     } catch (error) {
@@ -916,7 +976,10 @@ class _MapViewState extends State<MapView> {
     }
     final reports = _roadReports(advisories);
     final signature = reports
-        .map((report) => '${report.id}:${report.latitude}:${report.longitude}:${report.markerColor}')
+        .map(
+          (report) =>
+              '${report.id}:${report.latitude}:${report.longitude}:${report.markerColor}',
+        )
         .join('|');
     if (signature == _reportSignature) return;
     _reportSignature = signature;
@@ -955,7 +1018,10 @@ class _MapViewState extends State<MapView> {
     }
     final validRoads = _validRoads(roads);
     final signature = validRoads
-        .map((road) => '${road.roadId}:${road.isFlooded}:${road.severity}:${road.coordinates.hashCode}')
+        .map(
+          (road) =>
+              '${road.roadId}:${road.isFlooded}:${road.severity}:${road.coordinates.hashCode}',
+        )
         .join('|');
     if (signature == _roadSignature) return;
     final roadsChanged = _roadSignature != null;
@@ -987,9 +1053,7 @@ class _MapViewState extends State<MapView> {
         );
         await controller.setGeoJsonSource(
           _routeMarkersSourceId,
-          _routeMarkersFeatureCollection(
-            currentLocation: _currentUserLocation,
-          ),
+          _routeMarkersFeatureCollection(currentLocation: _currentUserLocation),
         );
         if (mounted) {
           setState(() {
@@ -1007,7 +1071,9 @@ class _MapViewState extends State<MapView> {
     } finally {
       _roadSyncRunning = false;
       if (mounted) {
-        _scheduleRoadSync(context.read<HomeViewModel>().flood?.roads ?? const <Road>[]);
+        _scheduleRoadSync(
+          context.read<HomeViewModel>().flood?.roads ?? const <Road>[],
+        );
       }
     }
   }
@@ -1027,13 +1093,16 @@ class _MapViewState extends State<MapView> {
         ),
         promoteId: 'stationId',
       );
+      if (!mounted) return;
       final advisories = context.read<HomeViewModel>().advisories;
       await controller.addGeoJsonSource(
         _reportSourceId,
         _reportFeatureCollection(_roadReports(advisories)),
         promoteId: 'reportId',
       );
-      final roads = context.read<HomeViewModel>().flood?.roads ?? const <Road>[];
+      if (!mounted) return;
+      final roads =
+          context.read<HomeViewModel>().flood?.roads ?? const <Road>[];
       await controller.addGeoJsonSource(
         _roadSourceId,
         _roadFeatureCollection(_validRoads(roads)),
@@ -1045,9 +1114,7 @@ class _MapViewState extends State<MapView> {
       );
       await controller.addGeoJsonSource(
         _routeMarkersSourceId,
-        _routeMarkersFeatureCollection(
-          currentLocation: _currentUserLocation,
-        ),
+        _routeMarkersFeatureCollection(currentLocation: _currentUserLocation),
       );
       await controller.addLineLayer(
         _roadSourceId,
@@ -1081,7 +1148,11 @@ class _MapViewState extends State<MapView> {
           circleOpacity: .25,
           circleStrokeWidth: 0,
         ),
-        filter: ['==', ['get', 'isSelected'], true],
+        filter: [
+          '==',
+          ['get', 'isSelected'],
+          true,
+        ],
         enableInteraction: false,
       );
       await controller.addCircleLayer(
@@ -1094,7 +1165,11 @@ class _MapViewState extends State<MapView> {
           circleStrokeWidth: 3.5,
           circleStrokeColor: '#155EEF',
         ),
-        filter: ['==', ['get', 'isSelected'], true],
+        filter: [
+          '==',
+          ['get', 'isSelected'],
+          true,
+        ],
         enableInteraction: false,
       );
       await controller.addCircleLayer(
@@ -1141,7 +1216,11 @@ class _MapViewState extends State<MapView> {
           circleStrokeWidth: 2,
           circleStrokeColor: '#FFFFFF',
         ),
-        filter: ['==', ['get', 'kind'], 'user-location'],
+        filter: [
+          '==',
+          ['get', 'kind'],
+          'user-location',
+        ],
         enableInteraction: false,
       );
       await controller.addCircleLayer(
@@ -1153,7 +1232,11 @@ class _MapViewState extends State<MapView> {
           circleStrokeWidth: 2,
           circleStrokeColor: '#FFFFFF',
         ),
-        filter: ['==', ['get', 'kind'], 'user-location'],
+        filter: [
+          '==',
+          ['get', 'kind'],
+          'user-location',
+        ],
         enableInteraction: false,
       );
       await controller.addCircleLayer(
@@ -1165,7 +1248,11 @@ class _MapViewState extends State<MapView> {
           circleStrokeWidth: 3,
           circleStrokeColor: '#FFFFFF',
         ),
-        filter: ['==', ['get', 'kind'], 'route-start'],
+        filter: [
+          '==',
+          ['get', 'kind'],
+          'route-start',
+        ],
         enableInteraction: false,
       );
       await controller.addCircleLayer(
@@ -1177,7 +1264,11 @@ class _MapViewState extends State<MapView> {
           circleStrokeWidth: 3,
           circleStrokeColor: '#FFFFFF',
         ),
-        filter: ['==', ['get', 'kind'], 'route-destination'],
+        filter: [
+          '==',
+          ['get', 'kind'],
+          'route-destination',
+        ],
         enableInteraction: false,
       );
       controller.onFeatureTapped.add(_onStationFeatureTapped);
@@ -1185,7 +1276,9 @@ class _MapViewState extends State<MapView> {
       if (!mounted) return;
       _scheduleAnnotationSync(context.read<HomeViewModel>().stations);
       _scheduleReportSync(context.read<HomeViewModel>().advisories);
-      _scheduleRoadSync(context.read<HomeViewModel>().flood?.roads ?? const <Road>[]);
+      _scheduleRoadSync(
+        context.read<HomeViewModel>().flood?.roads ?? const <Road>[],
+      );
       final plannedRoute = _plannedRoute;
       if (plannedRoute != null) {
         _showPlannedRoute(plannedRoute);
@@ -1229,18 +1322,13 @@ class _MapViewState extends State<MapView> {
               'roadFeatureId': 'route:${road.roadId}',
               'lineColor': _roadLineColor(road),
             },
-            'geometry': {
-              'type': 'LineString',
-              'coordinates': road.coordinates,
-            },
+            'geometry': {'type': 'LineString', 'coordinates': road.coordinates},
           },
         )
         .toList(),
   };
 
-  Map<String, dynamic> _routeLineFeatureCollection([
-    List<LatLng>? route,
-  ]) {
+  Map<String, dynamic> _routeLineFeatureCollection([List<LatLng>? route]) {
     final features = <Map<String, dynamic>>[];
     if (route != null && route.length >= 2) {
       features.add({
@@ -1303,9 +1391,8 @@ class _MapViewState extends State<MapView> {
                   Expanded(
                     child: Text(
                       road.roadName,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
                   _RiskChip(level: road.severity),
@@ -1313,19 +1400,41 @@ class _MapViewState extends State<MapView> {
               ),
               const SizedBox(height: 16),
               if (road.description.isNotEmpty) ...[
-                Text(road.description, style: Theme.of(context).textTheme.bodyLarge),
+                Text(
+                  road.description,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
                 const SizedBox(height: 12),
               ],
-              _MetricRow(label: 'Flood status', value: road.isFlooded ? 'Flooded' : 'Not reported flooded'),
-              _MetricRow(label: 'Estimated depth', value: '${road.estimatedDepthCm.toStringAsFixed(0)} cm · ${road.depthCategory}'),
-              _MetricRow(label: 'Hazard score', value: road.hazardScore.toStringAsFixed(1)),
-              _MetricRow(label: 'Road classification', value: road.roadClassification),
+              _MetricRow(
+                label: 'Flood status',
+                value: road.isFlooded ? 'Flooded' : 'Not reported flooded',
+              ),
+              _MetricRow(
+                label: 'Estimated depth',
+                value:
+                    '${road.estimatedDepthCm.toStringAsFixed(0)} cm · ${road.depthCategory}',
+              ),
+              _MetricRow(
+                label: 'Hazard score',
+                value: road.hazardScore.toStringAsFixed(1),
+              ),
+              _MetricRow(
+                label: 'Road classification',
+                value: road.roadClassification,
+              ),
               if (road.nationalRoute.isNotEmpty)
                 _MetricRow(label: 'Route', value: road.nationalRoute),
               if (road.drivableVehicles.isNotEmpty)
-                _MetricRow(label: 'Reported suitable for', value: road.drivableVehicles.join(', ')),
+                _MetricRow(
+                  label: 'Reported suitable for',
+                  value: road.drivableVehicles.join(', '),
+                ),
               if (road.isNearRiver)
-                const _MetricRow(label: 'Nearby condition', value: 'Near a river'),
+                const _MetricRow(
+                  label: 'Nearby condition',
+                  value: 'Near a river',
+                ),
             ],
           ),
         ),
@@ -1350,22 +1459,27 @@ class _MapViewState extends State<MapView> {
                   Expanded(
                     child: Text(
                       report.road.isEmpty ? 'Road flood report' : report.road,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
                   _RiskChip(level: report.severity),
                 ],
               ),
               const SizedBox(height: 16),
-              Text(report.description, style: Theme.of(context).textTheme.bodyLarge),
+              Text(
+                report.description,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
               const SizedBox(height: 16),
               _MetricRow(label: 'Passability', value: report.passability),
               _MetricRow(label: 'Water depth', value: report.depth),
               _MetricRow(label: 'Nearby landmark', value: report.landmark),
               _MetricRow(label: 'City', value: report.city),
-              _MetricRow(label: 'Reported', value: _dateLabel(report.publishedAt)),
+              _MetricRow(
+                label: 'Reported',
+                value: _dateLabel(report.publishedAt),
+              ),
             ],
           ),
         ),
@@ -1383,7 +1497,7 @@ class _MapViewState extends State<MapView> {
             'properties': {
               'stationId': station.stationId,
               'markerColor': _colorHex(_riskColor(station.riskLevel)),
-              'isSelected': station.stationId == _selectedStation?.stationId,
+              'isSelected': station.stationId == _selectedStationId,
             },
             'geometry': {
               'type': 'Point',
@@ -1396,11 +1510,18 @@ class _MapViewState extends State<MapView> {
 
   void _startPulseAnimation() {
     if (_pulseTimer != null) return;
-    _pulseTimer = Timer.periodic(const Duration(milliseconds: 80), (_) async {
+    // Slower tick with a bigger step: looks the same, roughly half the
+    // platform-channel traffic of the previous 80 ms timer.
+    _pulseTimer = Timer.periodic(const Duration(milliseconds: 150), (_) async {
       final controller = _controller;
-      if (controller == null || !_layersReady || _pulseUpdatePending) return;
+      if (!mounted ||
+          controller == null ||
+          !_layersReady ||
+          _pulseUpdatePending) {
+        return;
+      }
       _pulseUpdatePending = true;
-      _pulseProgress += _pulseExpanding ? .08 : -.08;
+      _pulseProgress += _pulseExpanding ? .12 : -.12;
       if (_pulseProgress >= 1) {
         _pulseProgress = 1;
         _pulseExpanding = false;
@@ -1416,13 +1537,16 @@ class _MapViewState extends State<MapView> {
             circleOpacity: .3 * (1 - _pulseProgress),
           ),
         );
-        await controller.setLayerProperties(
-          _selectedPulseLayerId,
-          CircleLayerProperties(
-            circleRadius: 18 + 10 * _pulseProgress,
-            circleOpacity: .28 * (1 - _pulseProgress),
-          ),
-        );
+        // Nothing selected means nothing to animate on the selected ring.
+        if (_selectedStationId != null) {
+          await controller.setLayerProperties(
+            _selectedPulseLayerId,
+            CircleLayerProperties(
+              circleRadius: 18 + 10 * _pulseProgress,
+              circleOpacity: .28 * (1 - _pulseProgress),
+            ),
+          );
+        }
       } catch (error) {
         _pulseTimer?.cancel();
         _pulseTimer = null;
@@ -1437,6 +1561,7 @@ class _MapViewState extends State<MapView> {
     MapLibreMapController controller,
     List<LatLng> points,
   ) async {
+    if (points.isEmpty) return;
     if (points.length == 1) {
       final point = points.single;
       await controller.animateCamera(
@@ -1482,6 +1607,7 @@ class _MapViewState extends State<MapView> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pulseTimer?.cancel();
     _controller?.onFeatureTapped.remove(_onStationFeatureTapped);
     super.dispose();
@@ -1495,72 +1621,56 @@ class _MapViewState extends State<MapView> {
       showDragHandle: true,
       builder: (context) {
         return SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-            child: Scrollable(
-              viewportBuilder: (context, position) {
-                return SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          _RiskDot(
-                            color: _riskColor(station.riskLevel),
-                            size: 12,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              station.stationName,
-                              style: Theme.of(context).textTheme.titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                          _RiskChip(level: station.riskLevel),
-                        ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _RiskDot(color: _riskColor(station.riskLevel), size: 12),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        station.stationName,
+                        style: Theme.of(context).textTheme.titleLarge
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                      const SizedBox(height: 20),
-                      _MetricRow(
-                        label: 'Water level',
-                        value: '${station.waterLevel.toStringAsFixed(1)} m',
-                      ),
-                      _MetricRow(
-                        label: 'Water level change · 1h',
-                        value:
-                            '${station.waterLevelDelta1h.toStringAsFixed(1)} m',
-                      ),
-                      _MetricRow(
-                        label: 'Rainfall · 10 min',
-                        value: '${station.rain10m.toStringAsFixed(1)} mm',
-                      ),
-                      _MetricRow(
-                        label: 'Rainfall · 1 hour',
-                        value: '${station.rain1h.toStringAsFixed(1)} mm',
-                      ),
-                      _MetricRow(
-                        label: 'Rainfall · 24 hours',
-                        value: '${station.rain24h.toStringAsFixed(1)} mm',
-                      ),
-                      _MetricRow(
-                        label: 'Water risk',
-                        value: station.waterRiskLevel,
-                      ),
-                      _MetricRow(
-                        label: 'Rain risk',
-                        value: station.rainRiskLevel,
-                      ),
-                      _MetricRow(
-                        label: 'Updated',
-                        value: _dateLabel(station.lastUpdated),
-                      ),
-                      const SizedBox(height: 20),
-                      _StationHistorySection(readings: history),
-                    ],
-                  ),
-                );
-              },
+                    ),
+                    _RiskChip(level: station.riskLevel),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _MetricRow(
+                  label: 'Water level',
+                  value: '${station.waterLevel.toStringAsFixed(1)} m',
+                ),
+                _MetricRow(
+                  label: 'Water level change · 1h',
+                  value: '${station.waterLevelDelta1h.toStringAsFixed(1)} m',
+                ),
+                _MetricRow(
+                  label: 'Rainfall · 10 min',
+                  value: '${station.rain10m.toStringAsFixed(1)} mm',
+                ),
+                _MetricRow(
+                  label: 'Rainfall · 1 hour',
+                  value: '${station.rain1h.toStringAsFixed(1)} mm',
+                ),
+                _MetricRow(
+                  label: 'Rainfall · 24 hours',
+                  value: '${station.rain24h.toStringAsFixed(1)} mm',
+                ),
+                _MetricRow(label: 'Water risk', value: station.waterRiskLevel),
+                _MetricRow(label: 'Rain risk', value: station.rainRiskLevel),
+                _MetricRow(
+                  label: 'Updated',
+                  value: _dateLabel(station.lastUpdated),
+                ),
+                const SizedBox(height: 20),
+                _StationHistorySection(readings: history),
+              ],
             ),
           ),
         );
@@ -1749,14 +1859,22 @@ class _HistoryChartPainter extends CustomPainter {
     final low = minValue - padding;
     final high = maxValue + padding;
     final timeStart = times.first.millisecondsSinceEpoch.toDouble();
-    final timeSpan = (times.last.millisecondsSinceEpoch - times.first.millisecondsSinceEpoch).toDouble();
+    final timeSpan =
+        (times.last.millisecondsSinceEpoch - times.first.millisecondsSinceEpoch)
+            .toDouble();
 
     Offset pointAt(int index) {
       final x = timeSpan == 0
-          ? chart.left + (values.length == 1 ? chart.width / 2 : chart.width * index / (values.length - 1))
+          ? chart.left +
+                (values.length == 1
+                    ? chart.width / 2
+                    : chart.width * index / (values.length - 1))
           : chart.left +
-              (times[index].millisecondsSinceEpoch - timeStart) / timeSpan * chart.width;
-      final y = chart.bottom - (values[index] - low) / (high - low) * chart.height;
+                (times[index].millisecondsSinceEpoch - timeStart) /
+                    timeSpan *
+                    chart.width;
+      final y =
+          chart.bottom - (values[index] - low) / (high - low) * chart.height;
       return Offset(x, y);
     }
 
@@ -1837,7 +1955,8 @@ _SafeRoute? _chooseSaferRoute(
         break;
       }
       final severity = report.severity.toLowerCase();
-      penaltyMinutes += severity.contains('critical') ||
+      penaltyMinutes +=
+          severity.contains('critical') ||
               severity.contains('severe') ||
               severity.contains('high')
           ? 15
@@ -1858,7 +1977,8 @@ _SafeRoute? _chooseSaferRoute(
         coordinates,
       );
       if (distance > 400) continue;
-      penaltyMinutes += severity.contains('critical') ||
+      penaltyMinutes +=
+          severity.contains('critical') ||
               severity.contains('alarm') ||
               severity.contains('high')
           ? 12
@@ -1953,10 +2073,11 @@ class _RoadReport {
 List<_RoadReport> _roadReports(Iterable<Advisory> advisories) {
   final reports = <_RoadReport>[];
   for (final advisory in advisories) {
-    final pins = advisory.locationPins.where((pin) => _validCoordinates(
-      pin.coordinates.lat,
-      pin.coordinates.lng,
-    )).toList();
+    final pins = advisory.locationPins
+        .where(
+          (pin) => _validCoordinates(pin.coordinates.lat, pin.coordinates.lng),
+        )
+        .toList();
     if (pins.isNotEmpty) {
       for (final pin in pins) {
         reports.add(_reportFromPin(advisory, pin));
@@ -1980,7 +2101,10 @@ List<_RoadReport> _roadReports(Iterable<Advisory> advisories) {
           publishedAt: advisory.publishedAt,
           latitude: advisory.coordinates.lat,
           longitude: advisory.coordinates.lng,
-          markerColor: _reportMarkerColor(advisory.severity, advisory.passability),
+          markerColor: _reportMarkerColor(
+            advisory.severity,
+            advisory.passability,
+          ),
         ),
       );
     }
@@ -2014,9 +2138,7 @@ bool _validCoordinates(double latitude, double longitude) =>
 List<Road> _validRoads(Iterable<Road> roads) => roads.where((road) {
   if (road.coordinates.length < 2) return false;
   return road.coordinates.every(
-    (point) =>
-        point.length >= 2 &&
-        _validCoordinates(point[1], point[0]),
+    (point) => point.length >= 2 && _validCoordinates(point[1], point[0]),
   );
 }).toList();
 
@@ -2108,7 +2230,11 @@ class _MapLegend extends StatelessWidget {
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           boxShadow: const [
-            BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 2)),
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
           ],
         ),
         child: Material(
@@ -2437,69 +2563,76 @@ class _RoutePlannerControls extends StatelessWidget {
     required ValueChanged<RoutePlace> onSelected,
     required ValueChanged<String> onTextChanged,
     required VoidCallback onPickOnMap,
-  }) =>
-      Autocomplete<RoutePlace>(
-        key: ValueKey('$label:${selectedLabel ?? ''}'),
-        initialValue: TextEditingValue(text: selectedLabel ?? ''),
-        displayStringForOption: (place) => place.label,
-        optionsBuilder: (value) =>
-            routePlanningService.searchPlaces(value.text),
-        onSelected: onSelected,
-        optionsViewBuilder: (context, select, options) => Align(
-          alignment: Alignment.topLeft,
-          child: Material(
-            elevation: 5,
-            borderRadius: BorderRadius.circular(12),
-            clipBehavior: Clip.antiAlias,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 210),
-              child: ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children: [
-                  for (final place in options)
-                    ListTile(
-                      dense: true,
-                      leading: const Icon(Icons.place_outlined),
-                      title: Text(place.label, maxLines: 1, overflow: TextOverflow.ellipsis),
-                      subtitle: place.detail.isEmpty ? null : Text(place.detail, maxLines: 1, overflow: TextOverflow.ellipsis),
-                      onTap: () => select(place),
-                    ),
-                ],
-              ),
-            ),
+  }) => Autocomplete<RoutePlace>(
+    key: ValueKey('$label:${selectedLabel ?? ''}'),
+    initialValue: TextEditingValue(text: selectedLabel ?? ''),
+    displayStringForOption: (place) => place.label,
+    optionsBuilder: (value) => routePlanningService.searchPlaces(value.text),
+    onSelected: onSelected,
+    optionsViewBuilder: (context, select, options) => Align(
+      alignment: Alignment.topLeft,
+      child: Material(
+        elevation: 5,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 210),
+          child: ListView(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            children: [
+              for (final place in options)
+                ListTile(
+                  dense: true,
+                  leading: const Icon(Icons.place_outlined),
+                  title: Text(
+                    place.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: place.detail.isEmpty
+                      ? null
+                      : Text(
+                          place.detail,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                  onTap: () => select(place),
+                ),
+            ],
           ),
         ),
-        fieldViewBuilder: (context, controller, focusNode, onSubmitted) =>
-            TextField(
-              controller: controller,
-              focusNode: focusNode,
-              onChanged: onTextChanged,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => onSubmitted(),
-              decoration: InputDecoration(
-                labelText: label,
-                hintText: 'Search an address or landmark',
-                prefixIcon: Icon(icon),
-                suffixIcon: IconButton(
-                  tooltip: 'Choose $label on map',
-                  onPressed: onPickOnMap,
-                  icon: const Icon(Icons.map_outlined),
-                ),
-                isDense: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
+      ),
+    ),
+    fieldViewBuilder: (context, controller, focusNode, onSubmitted) =>
+        TextField(
+          controller: controller,
+          focusNode: focusNode,
+          onChanged: onTextChanged,
+          textInputAction: TextInputAction.search,
+          onSubmitted: (_) => onSubmitted(),
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: 'Search an address or landmark',
+            prefixIcon: Icon(icon),
+            suffixIcon: IconButton(
+              tooltip: 'Choose $label on map',
+              onPressed: onPickOnMap,
+              icon: const Icon(Icons.map_outlined),
             ),
-      );
+            isDense: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+  );
 }
 
 String _distanceLabel(double meters) => meters >= 1000
     ? '${(meters / 1000).toStringAsFixed(1)} km'
     : '${meters.round()} m';
 
-String _durationLabel(double seconds) => '~${max(1, (seconds / 60).round())} min';
+String _durationLabel(double seconds) =>
+    '~${max(1, (seconds / 60).round())} min';
 
 String _savedAgeLabel(DateTime? savedAt) {
   if (savedAt == null) return 'time unavailable';
@@ -2620,7 +2753,7 @@ class _MetricRow extends StatelessWidget {
             ),
           ),
         ),
-        // const SizedBox(width: 16),
+        const SizedBox(width: 16),
         Flexible(
           child: Text(
             value,

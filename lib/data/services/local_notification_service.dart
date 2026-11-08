@@ -33,9 +33,10 @@ class LocalNotificationService {
       ),
     );
     await _plugin.initialize(settings: settings);
-    final android = _plugin.resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin
-    >();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     await android?.createNotificationChannel(_warningChannel);
   }
 
@@ -45,13 +46,16 @@ class LocalNotificationService {
   }
 
   Future<bool> enableNotifications() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin
-    >();
-    final ios = _plugin.resolvePlatformSpecificImplementation<
-      IOSFlutterLocalNotificationsPlugin
-    >();
-    final granted = await android?.requestNotificationsPermission() ??
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    final granted =
+        await android?.requestNotificationsPermission() ??
         await ios?.requestPermissions(alert: true, badge: true, sound: true) ??
         false;
     final prefs = await SharedPreferences.getInstance();
@@ -64,14 +68,10 @@ class LocalNotificationService {
     await prefs.setBool('notifications_enabled', false);
   }
 
-  Future<Set<String>> watchedStationIds() async {
-    final prefs = await SharedPreferences.getInstance();
-    return (prefs.getStringList(_watchedStationsKey) ?? const <String>[]).toSet();
-  }
-
   Future<void> setStationWatched(String stationId, bool watched) async {
     final prefs = await SharedPreferences.getInstance();
-    final ids = (prefs.getStringList(_watchedStationsKey) ?? <String>[]).toSet();
+    final ids = (prefs.getStringList(_watchedStationsKey) ?? <String>[])
+        .toSet();
     if (watched) {
       ids.add(stationId);
     } else {
@@ -100,31 +100,43 @@ class LocalNotificationService {
 
   Future<void> notifyWatchedStationChanges(Iterable<Station> stations) async {
     final prefs = await SharedPreferences.getInstance();
-    final watched = (prefs.getStringList(_watchedStationsKey) ?? const <String>[]).toSet();
+    final watched =
+        (prefs.getStringList(_watchedStationsKey) ?? const <String>[]).toSet();
     if (watched.isEmpty) return;
     Map<String, dynamic> previous;
     try {
-      previous = Map<String, dynamic>.from(jsonDecode(prefs.getString(_watchLevelsKey) ?? '{}') as Map);
+      previous = Map<String, dynamic>.from(
+        jsonDecode(prefs.getString(_watchLevelsKey) ?? '{}') as Map,
+      );
     } catch (_) {
       previous = {};
     }
     final current = <String, String>{};
     final threshold = prefs.getInt(_watchThresholdKey) ?? 2;
-    for (final station in stations.where((item) => watched.contains(item.stationId))) {
+    for (final station in stations.where(
+      (item) => watched.contains(item.stationId),
+    )) {
       final level = station.riskLevel.toUpperCase();
       current[station.stationId] = level;
       final rank = _riskRank(level);
-      final oldRank = _riskRank(previous[station.stationId]?.toString() ?? 'NORMAL');
-      if (oldRank < threshold && rank >= threshold &&
+      final oldRank = _riskRank(
+        previous[station.stationId]?.toString() ?? 'NORMAL',
+      );
+      if (oldRank < threshold &&
+          rank >= threshold &&
           (prefs.getBool('notifications_enabled') ?? false)) {
         await _show(
           id: 'watched:${station.stationId}:$level'.hashCode,
           title: '${station.stationName} is at $level risk',
-          body: 'Water level is ${station.waterLevel.toStringAsFixed(2)} m. Check the station map for details.',
+          body:
+              'Water level is ${station.waterLevel.toStringAsFixed(2)} m. Check the station map for details.',
         );
       }
     }
-    await prefs.setString(_watchLevelsKey, jsonEncode({...previous, ...current}));
+    await prefs.setString(
+      _watchLevelsKey,
+      jsonEncode({...previous, ...current}),
+    );
   }
 
   int _riskRank(String level) {
@@ -133,6 +145,27 @@ class LocalNotificationService {
     if (value.contains('alarm') || value.contains('high')) return 2;
     if (value.contains('warning') || value.contains('moderate')) return 1;
     return 0;
+  }
+
+  Future<void> notifyCurrentFloodRisks(Iterable<Station> stations) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool('notifications_enabled') ?? false)) return;
+
+    for (final station in stations) {
+      final level = station.riskLevel.toLowerCase();
+      final isDangerous =
+          level.contains('high') ||
+          level.contains('severe') ||
+          level.contains('critical');
+      if (!isDangerous) continue;
+
+      await _show(
+        id: 'flood:${station.stationId}'.hashCode,
+        title: 'Flood Warning: ${station.stationName}',
+        body:
+            '${station.riskLevel} risk detected. Water level: ${station.waterLevel}',
+      );
+    }
   }
 
   Future<void> notifyEarlyWarning({
@@ -151,16 +184,21 @@ class LocalNotificationService {
     await _show(
       id: key.hashCode,
       title: 'Flood early warning: $riskLevel',
-      body: '$stationName reports a water level of ${waterLevel.toStringAsFixed(2)} m.',
+      body:
+          '$stationName reports a water level of ${waterLevel.toStringAsFixed(2)} m.',
     );
   }
 
   Future<void> notifyNewAdvisories(Iterable<Advisory> advisories) async {
     final prefs = await SharedPreferences.getInstance();
-    final seen = (prefs.getStringList(_seenAdvisoryIdsKey) ?? <String>[]).toSet();
+    final seen = (prefs.getStringList(_seenAdvisoryIdsKey) ?? <String>[])
+        .toSet();
     final list = advisories.toList();
     if (!(prefs.getBool(_advisoriesInitializedKey) ?? false)) {
-      await prefs.setStringList(_seenAdvisoryIdsKey, list.map((item) => item.id).toList());
+      await prefs.setStringList(
+        _seenAdvisoryIdsKey,
+        list.map((item) => item.id).toList(),
+      );
       await prefs.setBool(_advisoriesInitializedKey, true);
       return;
     }
@@ -174,12 +212,18 @@ class LocalNotificationService {
     final count = unseen.length;
     await _show(
       id: latest.id.hashCode,
-      title: count == 1 ? 'New flood update: ${latest.severity}' : '$count new flood updates',
+      title: count == 1
+          ? 'New flood update: ${latest.severity}'
+          : '$count new flood updates',
       body: '${latest.road}, ${latest.city} · Open Advisories for details.',
     );
   }
 
-  Future<void> _show({required int id, required String title, required String body}) {
+  Future<void> _show({
+    required int id,
+    required String title,
+    required String body,
+  }) {
     return _plugin.show(
       id: id & 0x7fffffff,
       title: title,
@@ -195,5 +239,19 @@ class LocalNotificationService {
         iOS: DarwinNotificationDetails(),
       ),
     );
+  }
+
+  Future<void> requestPermission() async {
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.requestNotificationsPermission();
+  }
+
+  Future<Set<String>> watchedStationIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (prefs.getStringList(_watchedStationsKey) ?? const <String>[])
+        .toSet();
   }
 }
