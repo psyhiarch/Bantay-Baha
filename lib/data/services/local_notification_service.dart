@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bantay_baha/domain/models/advisory.dart';
@@ -13,9 +11,6 @@ class LocalNotificationService {
   static const _seenAdvisoryIdsKey = 'seen_advisory_ids';
   static const _seenWarningLevelsKey = 'seen_warning_levels';
   static const _advisoriesInitializedKey = 'advisories_initialized';
-  static const _watchedStationsKey = 'watched_station_ids';
-  static const _watchThresholdKey = 'watch_alert_threshold';
-  static const _watchLevelsKey = 'watched_station_risk_levels';
   static const _warningChannel = AndroidNotificationChannel(
     'early_warnings',
     'Early warnings',
@@ -66,85 +61,6 @@ class LocalNotificationService {
   Future<void> disableNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notifications_enabled', false);
-  }
-
-  Future<void> setStationWatched(String stationId, bool watched) async {
-    final prefs = await SharedPreferences.getInstance();
-    final ids = (prefs.getStringList(_watchedStationsKey) ?? <String>[])
-        .toSet();
-    if (watched) {
-      ids.add(stationId);
-    } else {
-      ids.remove(stationId);
-      final levels = prefs.getString(_watchLevelsKey);
-      if (levels != null) {
-        try {
-          final map = Map<String, dynamic>.from(jsonDecode(levels) as Map);
-          map.remove(stationId);
-          await prefs.setString(_watchLevelsKey, jsonEncode(map));
-        } catch (_) {}
-      }
-    }
-    await prefs.setStringList(_watchedStationsKey, ids.toList());
-  }
-
-  Future<int> watchAlertThreshold() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(_watchThresholdKey) ?? 2;
-  }
-
-  Future<void> setWatchAlertThreshold(int threshold) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_watchThresholdKey, threshold.clamp(1, 3).toInt());
-  }
-
-  Future<void> notifyWatchedStationChanges(Iterable<Station> stations) async {
-    final prefs = await SharedPreferences.getInstance();
-    final watched =
-        (prefs.getStringList(_watchedStationsKey) ?? const <String>[]).toSet();
-    if (watched.isEmpty) return;
-    Map<String, dynamic> previous;
-    try {
-      previous = Map<String, dynamic>.from(
-        jsonDecode(prefs.getString(_watchLevelsKey) ?? '{}') as Map,
-      );
-    } catch (_) {
-      previous = {};
-    }
-    final current = <String, String>{};
-    final threshold = prefs.getInt(_watchThresholdKey) ?? 2;
-    for (final station in stations.where(
-      (item) => watched.contains(item.stationId),
-    )) {
-      final level = station.riskLevel.toUpperCase();
-      current[station.stationId] = level;
-      final rank = _riskRank(level);
-      final oldRank = _riskRank(
-        previous[station.stationId]?.toString() ?? 'NORMAL',
-      );
-      if (oldRank < threshold &&
-          rank >= threshold &&
-          (prefs.getBool('notifications_enabled') ?? false)) {
-        await _show(
-          id: 'watched:${station.stationId}:$level'.hashCode,
-          title: '${station.stationName} is at $level risk',
-          body:
-              'Water level is ${station.waterLevel.toStringAsFixed(2)} m. Check the station map for details.',
-        );
-      }
-    }
-    await prefs.setString(
-      _watchLevelsKey,
-      jsonEncode({...previous, ...current}),
-    );
-  }
-
-  int _riskRank(String level) {
-    final value = level.toLowerCase();
-    if (value.contains('critical') || value.contains('severe')) return 3;
-    if (value.contains('alarm') || value.contains('high')) return 2;
-    if (value.contains('warning') || value.contains('moderate')) return 1;
-    return 0;
   }
 
   Future<void> notifyCurrentFloodRisks(Iterable<Station> stations) async {
@@ -247,11 +163,5 @@ class LocalNotificationService {
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.requestNotificationsPermission();
-  }
-
-  Future<Set<String>> watchedStationIds() async {
-    final prefs = await SharedPreferences.getInstance();
-    return (prefs.getStringList(_watchedStationsKey) ?? const <String>[])
-        .toSet();
   }
 }

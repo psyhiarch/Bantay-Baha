@@ -6,18 +6,15 @@ import 'package:bantay_baha/domain/models/advisory.dart';
 import 'package:bantay_baha/domain/models/metrics.dart';
 import 'package:bantay_baha/domain/models/station.dart';
 import 'package:bantay_baha/domain/repositories/flood_repository.dart';
-import 'package:bantay_baha/data/services/local_notification_service.dart';
 import 'package:bantay_baha/data/services/station_history_service.dart';
 import 'package:flutter/foundation.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final FloodRepository _floodRepository;
-  final LocalNotificationService _notificationService;
   final StationHistoryService _stationHistoryService;
 
   HomeViewModel({
     required this._floodRepository,
-    required this._notificationService,
     required this._stationHistoryService,
   });
 
@@ -28,21 +25,6 @@ class HomeViewModel extends ChangeNotifier {
   Metrics? _metrics;
   final List<Station> _stations = [];
   Map<String, List<StationReading>> _stationHistory = {};
-  Set<String> _watchedStationIds = {};
-  Set<String> get watchedStationIds => Set.unmodifiable(_watchedStationIds);
-  bool isStationWatched(String stationId) =>
-      _watchedStationIds.contains(stationId);
-
-  Future<void> toggleStationWatch(String stationId) async {
-    final watched = !_watchedStationIds.contains(stationId);
-    if (watched) {
-      _watchedStationIds = {..._watchedStationIds, stationId};
-    } else {
-      _watchedStationIds = {..._watchedStationIds}..remove(stationId);
-    }
-    notifyListeners();
-    await _notificationService.setStationWatched(stationId, watched);
-  }
 
   late final UnmodifiableListView<Station> _stationsView = UnmodifiableListView(
     _stations,
@@ -74,7 +56,6 @@ class HomeViewModel extends ChangeNotifier {
       (_) => _refreshAll(),
     );
     if (_isLoading) return;
-    _watchedStationIds = await _notificationService.watchedStationIds();
     _isLoading = true;
 
     _floodError = null;
@@ -104,7 +85,6 @@ class HomeViewModel extends ChangeNotifier {
         ..addAll(result.stations);
       _metrics = result.metrics;
       if (!_floodRepository.isUsingCachedFloodData) {
-        //await _notificationService.notifyWatchedStationChanges(result.stations);
         try {
           _stationHistory = await _stationHistoryService.record(
             result.stations,
@@ -113,20 +93,6 @@ class HomeViewModel extends ChangeNotifier {
         } catch (error) {
           debugPrint('Station history could not be saved: $error');
         }
-
-        // for (final station in result.stations) {
-        //   final level = station.riskLevel.toLowerCase();
-        //   if (level.contains('high') ||
-        //       level.contains('severe') ||
-        //       level.contains('critical')) {
-        //     await _notificationService.notifyEarlyWarning(
-        //       stationId: station.stationId,
-        //       stationName: station.stationName,
-        //       riskLevel: station.riskLevel,
-        //       waterLevel: station.waterLevel,
-        //     );
-        //   }
-        // }
       }
 
       _floodError = null;
@@ -157,9 +123,6 @@ class HomeViewModel extends ChangeNotifier {
     try {
       final result = await _floodRepository.getAdvisories();
       if (result == null) throw Exception('Advisories are unavailable.');
-      // if (!_floodRepository.isUsingCachedAdvisories) {
-      //   await _notificationService.notifyNewAdvisories(result);
-      // }
       _advisories = result;
     } catch (error) {
       debugPrint('Advisory loading error: $error');

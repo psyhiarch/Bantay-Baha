@@ -4,7 +4,6 @@ import 'package:bantay_baha/data/services/local_notification_service.dart';
 import 'package:bantay_baha/ui/advisories/advisories_view.dart';
 import 'package:bantay_baha/ui/home/home_view.dart';
 import 'package:bantay_baha/ui/home/home_viewmodel.dart';
-import 'package:bantay_baha/ui/map/map_route_args.dart';
 import 'package:bantay_baha/ui/map/map_view.dart';
 import 'package:bantay_baha/ui/settings/settings_view.dart';
 import 'package:bantay_baha/ui/theme/app_theme.dart';
@@ -14,96 +13,176 @@ import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 
-GoRouter _goRouter = GoRouter(
+final GoRouter _goRouter = GoRouter(
+  initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      pageBuilder: (context, state) {
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: ChangeNotifierProvider(
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) =>
+          ChangeNotifierProvider<HomeViewModel>(
             create: (_) => getIt<HomeViewModel>()..init(),
-            child: const HomeView(),
+            child: _AppShell(navigationShell: navigationShell),
           ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(-1.0, 0.0),
-                end: Offset.zero,
-              ).animate(animation),
-              child: child,
-            );
-          },
-        );
-      },
-      routes: [
-        GoRoute(
-          path: '/advisories',
-          pageBuilder: (context, state) {
-            final model = state.extra! as HomeViewModel;
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: ChangeNotifierProvider.value(
-                value: model,
-                child: const AdvisoriesView(),
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    );
-                  },
-            );
-          },
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(path: '/', builder: (context, state) => const HomeView()),
+          ],
         ),
-        GoRoute(
-          path: '/map',
-          pageBuilder: (context, state) {
-            final args = state.extra! as MapRouteArgs;
-            return CustomTransitionPage(
-              key: state.pageKey,
-              child: ChangeNotifierProvider.value(
-                value: args.model,
-                child: MapView(selectedStationId: args.selectedStationId),
-              ),
-              transitionsBuilder:
-                  (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    );
-                  },
-            );
-          },
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/map',
+              builder: (context, state) =>
+                  MapView(selectedStationId: state.extra as String?),
+            ),
+          ],
         ),
-        GoRoute(
-          path: '/settings',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const SettingsView(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(1.0, 0.0),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
-          ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/advisories',
+              builder: (context, state) => const AdvisoriesView(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/settings',
+              builder: (context, state) => const SettingsView(),
+            ),
+          ],
         ),
       ],
     ),
   ],
 );
+
+class _AppShell extends StatelessWidget {
+  const _AppShell({required this.navigationShell});
+
+  final StatefulNavigationShell navigationShell;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(child: navigationShell),
+          SafeArea(
+            top: false,
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                border: Border(
+                  top: BorderSide(color: theme.colorScheme.outlineVariant),
+                ),
+              ),
+              child: SizedBox(
+                height: 64,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _navigationDestination(
+                            context,
+                            index: 0,
+                            label: 'Home',
+                            icon: Icons.home_outlined,
+                            selectedIcon: Icons.home_rounded,
+                          ),
+                        ),
+                        Expanded(
+                          child: _navigationDestination(
+                            context,
+                            index: 1,
+                            label: 'Map',
+                            icon: Icons.map_outlined,
+                            selectedIcon: Icons.map_rounded,
+                          ),
+                        ),
+
+                        Expanded(
+                          child: _navigationDestination(
+                            context,
+                            index: 2,
+                            label: 'Advisories',
+                            icon: Icons.newspaper_outlined,
+                            selectedIcon: Icons.newspaper_rounded,
+                          ),
+                        ),
+
+                        Expanded(
+                          child: _navigationDestination(
+                            context,
+                            index: 3,
+                            label: 'Settings',
+                            icon: Icons.settings_outlined,
+                            selectedIcon: Icons.settings_rounded,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _navigationDestination(
+    BuildContext context, {
+    required int index,
+    required String label,
+    required IconData icon,
+    required IconData selectedIcon,
+  }) {
+    final theme = Theme.of(context);
+    final selected = navigationShell.currentIndex == index;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          navigationShell.goBranch(
+            index,
+            initialLocation: index == navigationShell.currentIndex,
+          );
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              selected ? selectedIcon : icon,
+              size: 21,
+              color: selected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 1),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontSize: 10,
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

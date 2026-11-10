@@ -20,7 +20,6 @@ void setupLocator() {
   getIt.registerFactory<HomeViewModel>(
     () => HomeViewModel(
       floodRepository: getIt<FloodRepository>(),
-      notificationService: getIt<LocalNotificationService>(),
       stationHistoryService: getIt<StationHistoryService>(),
     ),
   );

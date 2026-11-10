@@ -7,11 +7,31 @@ class RouteCandidate {
     required this.coordinates,
     required this.distanceMeters,
     required this.durationSeconds,
+    required this.instructions,
+    required this.via,
   });
 
   final List<List<double>> coordinates;
   final double distanceMeters;
   final double durationSeconds;
+  final List<RouteInstruction> instructions;
+  final List<String> via;
+}
+
+class RouteInstruction {
+  const RouteInstruction({
+    required this.instruction,
+    required this.distanceMeters,
+    required this.maneuver,
+    required this.modifier,
+    required this.street,
+  });
+
+  final String instruction;
+  final double distanceMeters;
+  final String maneuver;
+  final String modifier;
+  final String street;
 }
 
 class RoutePlace {
@@ -99,10 +119,33 @@ class RoutePlanningService {
         if (coordinates.length < 2 || distance is! num || duration is! num) {
           throw const FormatException('Route details are incomplete.');
         }
+        final instructions = (route['steps'] as List<dynamic>? ?? const [])
+            .whereType<Map>()
+            .map((rawStep) => Map<String, dynamic>.from(rawStep))
+            .where(
+              (step) =>
+                  step['instruction'] is String && step['distanceM'] is num,
+            )
+            .map(
+              (step) => RouteInstruction(
+                instruction: step['instruction'] as String,
+                distanceMeters: (step['distanceM'] as num).toDouble(),
+                maneuver: step['maneuver']?.toString() ?? '',
+                modifier: step['modifier']?.toString() ?? '',
+                street: step['street']?.toString() ?? '',
+              ),
+            )
+            .toList();
+        final via = (route['via'] as List<dynamic>? ?? const [])
+            .whereType<String>()
+            .where((street) => street.isNotEmpty)
+            .toList();
         return RouteCandidate(
           coordinates: coordinates,
           distanceMeters: distance.toDouble(),
           durationSeconds: duration.toDouble(),
+          instructions: instructions,
+          via: via,
         );
       }).toList();
     } on RoutePlanningException {

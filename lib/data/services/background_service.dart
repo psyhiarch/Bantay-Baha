@@ -57,7 +57,6 @@ Future<void> checkFloodAlerts({
     failure = StateError('Flood data unavailable.');
   } else if (!floodRepository.isUsingCachedFloodData) {
     await service.notifyCurrentFloodRisks(flood.stations);
-    await service.notifyWatchedStationChanges(flood.stations);
   }
 
   final advisories = await floodRepository.getAdvisories();

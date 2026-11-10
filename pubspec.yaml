@@ -45,7 +45,6 @@ dependencies:
   hive: ^2.2.3
   flutter_local_notifications: ^22.3.3
   shared_preferences: ^2.5.3
-  url_launcher: ^6.3.3
   geolocator: ^14.0.1
   workmanager: ^0.10.0
 
@@ -105,3 +104,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+dependency_overrides:
+  # Avoid the Android JNI backend until its native instance registration is reliable.
+  shared_preferences_android: 2.4.28
