@@ -122,7 +122,7 @@ environment:
 - [x] Show station detail sheet
 - [x] Refactor into a cleaner architecture
 - [x] Add a telemetry dashboard
-- [ ] Add geocoding/search for places
+- [x] Add find route
 - [ ] Add production-grade tests for the monitoring flow
 
 ## Credits
