@@ -306,7 +306,7 @@ class _MapViewState extends State<MapView> {
                         ),
                       if (showRouteStatus)
                         Positioned(
-                          top: 14,
+                          bottom: 14,
                           right: 14,
                           child: Material(
                             color: Theme.of(context).colorScheme.surface
@@ -405,7 +405,7 @@ class _MapViewState extends State<MapView> {
                         ),
                       if (showMapLegend)
                         Positioned(
-                          top: showRouteStatus ? 68 : 14,
+                          top: 14,
                           left: 14,
                           child: _MapLegend(
                             count: stations.length,
@@ -426,7 +426,7 @@ class _MapViewState extends State<MapView> {
                         Positioned(
                           left: 14,
                           right: 14,
-                          bottom: 14,
+                          bottom: showRouteStatus ? 76 : 14,
                           child: _SelectedStationCard(
                             station: selectedStation,
                             onClose: _clearSelection,

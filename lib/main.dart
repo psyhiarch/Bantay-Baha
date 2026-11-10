@@ -1,3 +1,4 @@
+import 'package:bantay_baha/core/app_restart.dart';
 import 'package:bantay_baha/core/locator.dart';
 import 'package:bantay_baha/data/services/background_service.dart';
 import 'package:bantay_baha/data/services/local_notification_service.dart';
@@ -13,7 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:provider/provider.dart';
 
-final GoRouter _goRouter = GoRouter(
+GoRouter _createGoRouter() => GoRouter(
   initialLocation: '/',
   routes: [
     StatefulShellRoute.indexedStack(
@@ -192,6 +193,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late final GoRouter _goRouter = _createGoRouter();
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppThemeController>(
@@ -203,6 +206,12 @@ class _MyAppState extends State<MyApp> {
         routerConfig: _goRouter,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _goRouter.dispose();
+    super.dispose();
   }
 }
 
@@ -219,6 +228,9 @@ Future<void> main() async {
     await schedulePeriodicTask();
   }
   runApp(
-    ChangeNotifierProvider.value(value: themeController, child: const MyApp()),
+    ChangeNotifierProvider.value(
+      value: themeController,
+      child: const AppRestart(child: MyApp()),
+    ),
   );
 }

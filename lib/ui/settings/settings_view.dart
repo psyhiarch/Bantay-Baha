@@ -1,3 +1,4 @@
+import 'package:bantay_baha/core/app_restart.dart';
 import 'package:bantay_baha/core/locator.dart';
 import 'package:bantay_baha/data/services/background_service.dart';
 import 'package:bantay_baha/data/services/local_notification_service.dart';
@@ -42,14 +43,40 @@ class _SettingsViewState extends State<SettingsView> {
   Future<void> _setMapEffectMode(MapEffectMode mode) async {
     try {
       await _mapEffects.save(mode);
-      if (mounted) setState(() => _mapEffectMode = mode);
     } catch (error) {
       debugPrint('Unable to save map effect preference: $error');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Could not save the map effect setting.')),
       );
+      return;
     }
+
+    if (!mounted) return;
+    final changed = _mapEffectMode != mode;
+    setState(() => _mapEffectMode = mode);
+    if (!changed) return;
+
+    final restart = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Restart required'),
+        content: const Text(
+          'Restart the app now to apply the map effect change?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Later'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Restart now'),
+          ),
+        ],
+      ),
+    );
+    if (restart == true && mounted) AppRestart.restartApp(context);
   }
 
   Future<void> _setEnabled(bool enabled) async {
