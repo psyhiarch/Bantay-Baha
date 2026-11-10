@@ -21,6 +21,7 @@ class _RoutePlannerControls extends StatelessWidget {
     required this.onPickStartOnMap,
     required this.onPickDestinationOnMap,
     required this.onPlanRoute,
+    required this.onViewRouteDetails,
     required this.onToggle,
     required this.onCancel,
   });
@@ -44,6 +45,7 @@ class _RoutePlannerControls extends StatelessWidget {
   final VoidCallback onPickStartOnMap;
   final VoidCallback onPickDestinationOnMap;
   final VoidCallback onPlanRoute;
+  final VoidCallback onViewRouteDetails;
   final VoidCallback onToggle;
   final VoidCallback onCancel;
 
@@ -204,25 +206,15 @@ class _RoutePlannerControls extends StatelessWidget {
                         color: theme.colorScheme.primary,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      route!.riskPenaltyMinutes > 0
-                          ? 'Bahaba travel-time estimate · +${_durationLabel(route!.riskPenaltyMinutes * 60)} in safety ranking for nearby hazards.'
-                          : 'No matching hazards found along this route.',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (route!.via.isNotEmpty) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        'Via ${route!.via.join(' · ')}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
                   ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: onViewRouteDetails,
+                  icon: const Icon(Icons.directions_outlined, size: 18),
+                  label: const Text('View directions'),
                 ),
               ),
             ],
@@ -264,74 +256,9 @@ class _RoutePlannerControls extends StatelessWidget {
                 ),
               ],
             ),
-            if (route?.instructions.isNotEmpty ?? false) ...[
-              const SizedBox(height: 4),
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                childrenPadding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
-                title: const Text('Directions'),
-                subtitle: Text('${route!.instructions.length} steps'),
-                children: [
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 220),
-                    child: ListView(
-                      shrinkWrap: true,
-                      children: [
-                        for (final instruction in route!.instructions)
-                          _routeInstructionTile(context, instruction),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
           ],
         ),
       ),
-    );
-  }
-
-  IconData _routeInstructionIcon(RouteInstruction instruction) {
-    final maneuver = instruction.maneuver.toLowerCase();
-    final modifier = instruction.modifier.toLowerCase();
-    if (maneuver == 'arrive') return Icons.location_on_outlined;
-    if (maneuver == 'depart') return Icons.trip_origin_rounded;
-    if (maneuver.contains('uturn')) {
-      return modifier == 'right' ? Icons.u_turn_right : Icons.u_turn_left;
-    }
-    if (modifier.contains('left')) return Icons.turn_left_rounded;
-    if (modifier.contains('right')) return Icons.turn_right_rounded;
-    if (maneuver == 'turn') return Icons.turn_slight_right_rounded;
-    return Icons.straight_rounded;
-  }
-
-  Widget _routeInstructionTile(
-    BuildContext context,
-    RouteInstruction instruction,
-  ) {
-    final street = instruction.street;
-    final subtitle =
-        street.isNotEmpty &&
-            !instruction.instruction.toLowerCase().contains(
-              street.toLowerCase(),
-            )
-        ? street
-        : null;
-    return ListTile(
-      dense: true,
-      contentPadding: EdgeInsets.zero,
-      minLeadingWidth: 24,
-      horizontalTitleGap: 8,
-      leading: Icon(_routeInstructionIcon(instruction), size: 19),
-      title: Text(instruction.instruction),
-      subtitle: subtitle == null ? null : Text(subtitle),
-      trailing: instruction.distanceMeters > 0
-          ? Text(
-              _distanceLabel(instruction.distanceMeters),
-              style: Theme.of(context).textTheme.labelSmall,
-            )
-          : null,
     );
   }
 
@@ -405,4 +332,170 @@ class _RoutePlannerControls extends StatelessWidget {
           ),
         ),
   );
+}
+
+class _RouteDetailsPage extends StatelessWidget {
+  const _RouteDetailsPage({
+    required this.route,
+    required this.startLabel,
+    required this.destinationLabel,
+  });
+
+  final _SafeRoute route;
+  final String? startLabel;
+  final String? destinationLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Route directions')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${_distanceLabel(route.distanceMeters)} · ${_durationLabel(route.durationSeconds)}',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _endpoint(
+                    context,
+                    Icons.trip_origin_rounded,
+                    'Start',
+                    startLabel ?? 'Map selection',
+                  ),
+                  const SizedBox(height: 12),
+                  _endpoint(
+                    context,
+                    Icons.location_on_outlined,
+                    'Destination',
+                    destinationLabel ?? 'Map selection',
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: Icon(
+                route.riskPenaltyMinutes > 0
+                    ? Icons.warning_amber_rounded
+                    : Icons.verified_outlined,
+                color: route.riskPenaltyMinutes > 0
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.primary,
+              ),
+              title: const Text('Flood safety check'),
+              subtitle: Text(
+                route.riskPenaltyMinutes > 0
+                    ? 'Nearby flood hazards add a ${_durationLabel(route.riskPenaltyMinutes * 60)} penalty to this route’s safety ranking.'
+                    : 'No matching flood hazards were found along this route.',
+              ),
+            ),
+          ),
+          if (route.via.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.alt_route_rounded),
+                title: const Text('Via'),
+                subtitle: Text(route.via.join(' · ')),
+              ),
+            ),
+          ],
+          const SizedBox(height: 20),
+          Text('Turn-by-turn directions', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          if (route.instructions.isEmpty)
+            const Card(
+              child: ListTile(
+                leading: Icon(Icons.info_outline_rounded),
+                title: Text('Turn-by-turn directions are unavailable.'),
+              ),
+            )
+          else
+            for (var index = 0; index < route.instructions.length; index++)
+              _instructionTile(context, index + 1, route.instructions[index]),
+        ],
+      ),
+    );
+  }
+
+  Widget _endpoint(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, size: 20),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: Theme.of(context).textTheme.labelMedium),
+            Text(value, style: Theme.of(context).textTheme.bodyLarge),
+          ],
+        ),
+      ),
+    ],
+  );
+
+  Widget _instructionTile(
+    BuildContext context,
+    int step,
+    RouteInstruction instruction,
+  ) {
+    final maneuver = instruction.maneuver.toLowerCase();
+    final modifier = instruction.modifier.toLowerCase();
+    final icon = maneuver == 'arrive'
+        ? Icons.location_on_outlined
+        : maneuver == 'depart'
+        ? Icons.trip_origin_rounded
+        : maneuver.contains('uturn')
+        ? modifier == 'right'
+              ? Icons.u_turn_right
+              : Icons.u_turn_left
+        : modifier.contains('left')
+        ? Icons.turn_left_rounded
+        : modifier.contains('right')
+        ? Icons.turn_right_rounded
+        : maneuver == 'turn'
+        ? Icons.turn_slight_right_rounded
+        : Icons.straight_rounded;
+    final street = instruction.street;
+    final subtitle =
+        street.isNotEmpty &&
+            !instruction.instruction.toLowerCase().contains(
+              street.toLowerCase(),
+            )
+        ? street
+        : null;
+
+    return Card(
+      child: ListTile(
+        leading: CircleAvatar(child: Icon(icon, size: 19)),
+        title: Text('$step. ${instruction.instruction}'),
+        subtitle: subtitle == null ? null : Text(subtitle),
+        trailing: instruction.distanceMeters > 0
+            ? Text(
+                _distanceLabel(instruction.distanceMeters),
+                style: Theme.of(context).textTheme.labelSmall,
+              )
+            : null,
+      ),
+    );
+  }
 }

@@ -39,14 +39,14 @@ class _AdvisorySummary extends StatelessWidget {
               children: [
                 Text(
                   urgent > 0
-                      ? '$urgent urgent update${urgent == 1 ? '' : 's'}'
-                      : 'Community updates',
+                      ? '$urgent urgent report${urgent == 1 ? '' : 's'}'
+                      : 'Official reports',
                   style: Theme.of(context).textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  '$total flood and road ${total == 1 ? 'report' : 'reports'}',
+                  '$total reports from official agencies and news outlets',
                   style: Theme.of(context).textTheme.bodySmall
                       ?.copyWith(color: scheme.onSurfaceVariant),
                 ),
@@ -74,6 +74,13 @@ class _AdvisoryCard extends StatelessWidget {
       advisory.landmark,
       advisory.city,
     ].where((part) => part.trim().isNotEmpty).toSet().join(' · ');
+    final author = advisory.authorName.trim();
+    final handle = advisory.authorHandle.trim();
+    final source = advisory.source.trim().isEmpty
+        ? 'Official report'
+        : advisory.source.toUpperCase() == 'NEWS'
+        ? 'News report'
+        : '${advisory.source} official';
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -85,8 +92,19 @@ class _AdvisoryCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _SeverityBadge(label: advisory.severity, color: color),
-                  const Spacer(),
+                  Expanded(
+                    child: Text(
+                      author.isEmpty || author.toLowerCase() == 'unknown'
+                          ? source
+                          : author,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
                     _timeLabel(advisory.publishedAt),
                     style: theme.textTheme.labelSmall?.copyWith(
@@ -95,6 +113,38 @@ class _AdvisoryCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (handle.isNotEmpty &&
+                  !{'unknown', 'search', 'feed', 'undefined', 'null'}
+                      .contains(handle.toLowerCase().replaceFirst('@', ''))) ...[
+                const SizedBox(height: 3),
+                Text(
+                  '@${handle.replaceFirst(RegExp(r'^@'), '')}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: scheme.primary,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  _SeverityBadge(label: advisory.severity, color: color),
+                  _PassabilityBadge(advisory.passability),
+                ],
+              ),
+              if (advisory.locationPins.length > 1) ...[
+                const SizedBox(height: 10),
+                Chip(
+                  avatar: const Icon(Icons.map_outlined, size: 16),
+                  label: Text(
+                    '${advisory.locationPins.length} flood locations on map',
+                  ),
+                  visualDensity: VisualDensity.compact,
+                  side: BorderSide.none,
+                  backgroundColor: scheme.secondaryContainer,
+                ),
+              ],
               const SizedBox(height: 14),
               Text(
                 advisory.cleanedText,
@@ -129,12 +179,16 @@ class _AdvisoryCard extends StatelessWidget {
                 children: [
                   Icon(Icons.water_drop_outlined, size: 16, color: color),
                   const SizedBox(width: 5),
-                  Text(
-                    advisory.depthInches > 0
-                        ? '${advisory.depthInches} in · ${advisory.depthCategory}'
-                        : advisory.depthCategory,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
+                  Expanded(
+                    child: Text(
+                      advisory.depthInches > 0
+                          ? '${advisory.depthCategory} · ${advisory.depthInches} in'
+                          : advisory.depthCategory,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                   const Spacer(),
@@ -158,6 +212,55 @@ class _AdvisoryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PassabilityBadge extends StatelessWidget {
+  const _PassabilityBadge(this.passability);
+
+  final String passability;
+
+  @override
+  Widget build(BuildContext context) {
+    final normalized = passability.toUpperCase();
+    final isClosed =
+        normalized.contains('NOT_PASSABLE') ||
+        normalized.contains('IMPASSABLE') ||
+        normalized.contains('CLOSED');
+    final isSubsided = normalized.contains('SUBSIDED');
+    final isPassable = normalized.contains('PASSABLE') && !isClosed;
+    final color = isClosed
+        ? AppTheme.danger
+        : isSubsided || isPassable
+        ? AppTheme.success
+        : normalized.isEmpty
+        ? Theme.of(context).colorScheme.onSurfaceVariant
+        : AppTheme.warningAmber;
+    return _SeverityBadge(
+      label: _passabilityLabel(passability),
+      color: color,
+    );
+  }
+}
+
+String _passabilityLabel(String passability) {
+  final normalized = passability.toUpperCase();
+  return switch (normalized) {
+    'NOT_PASSABLE_ALL' => 'Not passable · all vehicles',
+    'NOT_PASSABLE_LIGHT' => 'Not passable · light vehicles',
+    'PASSABLE_ALL' => 'Passable · all vehicles',
+    'SUBSIDED' => 'Flood subsided',
+    '' => 'Passability not reported',
+    _ => passability
+        .replaceAll('_', ' ')
+        .toLowerCase()
+        .split(' ')
+        .map(
+          (word) => word.isEmpty
+              ? word
+              : '${word[0].toUpperCase()}${word.substring(1)}',
+        )
+        .join(' '),
+  };
 }
 
 class _SeverityBadge extends StatelessWidget {

@@ -1,6 +1,20 @@
 part of 'map_view.dart';
 
 extension _MapViewRouteActions on _MapViewState {
+  void _showRouteDetails(BuildContext routeContext) {
+    final route = _plannedRoute;
+    if (route == null) return;
+    Navigator.of(routeContext).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => _RouteDetailsPage(
+          route: route,
+          startLabel: _routeStartLabel,
+          destinationLabel: _routeDestinationLabel,
+        ),
+      ),
+    );
+  }
+
   void _beginRoutePlanning() {
     _routeRequestId++;
     _updateState(() {
@@ -71,6 +85,7 @@ extension _MapViewRouteActions on _MapViewState {
                   startLabel: _routeStartLabel,
                   destinationLabel: _routeDestinationLabel,
                   route: _plannedRoute,
+                  onViewRouteDetails: () => _showRouteDetails(dialogContext),
                   error: _routeError,
                   locationError: _locationError,
                   isFetchingLocation: _isFetchingLocation,

@@ -16,7 +16,7 @@ Future<void> _showDetails(BuildContext context, Advisory advisory) async {
               children: [
                 Expanded(
                   child: Text(
-                    'Flood report',
+                    'Official flood & hazard advisory',
                     style: Theme.of(context).textTheme.titleLarge
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
@@ -26,9 +26,17 @@ Future<void> _showDetails(BuildContext context, Advisory advisory) async {
             ),
             const SizedBox(height: 8),
             Text(
-              '${advisory.authorName} · ${_timeLabel(advisory.publishedAt)}',
+              '${_advisorySourceLabel(advisory)} · ${_timeLabel(advisory.publishedAt)}',
               style: Theme.of(context).textTheme.bodySmall,
             ),
+            if (advisory.authorHandle.trim().isNotEmpty) ...[
+              const SizedBox(height: 3),
+              Text(
+                '@${advisory.authorHandle.trim().replaceFirst(RegExp(r'^@'), '')}',
+                style: Theme.of(context).textTheme.labelMedium
+                    ?.copyWith(color: Theme.of(context).colorScheme.primary),
+              ),
+            ],
             const SizedBox(height: 20),
             Text(
               advisory.cleanedText,
@@ -39,18 +47,58 @@ Future<void> _showDetails(BuildContext context, Advisory advisory) async {
             _DetailRow(label: 'Road', value: advisory.road),
             _DetailRow(label: 'Nearby landmark', value: advisory.landmark),
             _DetailRow(label: 'City', value: advisory.city),
-            _DetailRow(label: 'Passability', value: advisory.passability),
+            _DetailRow(
+              label: 'Passability',
+              value: _passabilityLabel(advisory.passability),
+            ),
             _DetailRow(
               label: 'Water depth',
               value:
                   '${advisory.depthCategory}${advisory.depthInches > 0 ? ' · ${advisory.depthInches} in' : ''}',
             ),
-            _DetailRow(label: 'Source', value: advisory.source),
+            _DetailRow(label: 'Reporting source', value: advisory.source),
+            if (advisory.locationPins.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                'Flood locations',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 4),
+              for (final pin in advisory.locationPins)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.location_on_outlined),
+                  trailing: _SeverityBadge(
+                    label: pin.severity.toString(),
+                    color: _severityColor(context, pin.severity.toString()),
+                  ),
+                  title: Text(_locationPinLabel(pin)),
+                  subtitle: Text(
+                    '${_passabilityLabel(pin.passability)} · ${pin.depthCategory}',
+                  ),
+                ),
+            ],
           ],
         ),
       ),
     ),
   );
+}
+
+String _advisorySourceLabel(Advisory advisory) {
+  final author = advisory.authorName.trim();
+  if (author.isNotEmpty && author.toLowerCase() != 'unknown') return author;
+  return advisory.source.toUpperCase() == 'NEWS'
+      ? 'News report'
+      : '${advisory.source} official';
+}
+
+String _locationPinLabel(LocationPin pin) {
+  final location = [
+    pin.road,
+    pin.landmark,
+  ].where((part) => part.trim().isNotEmpty).toSet().join(' · ');
+  return location.isEmpty ? 'Flood location' : location;
 }
 
 class _DetailRow extends StatelessWidget {

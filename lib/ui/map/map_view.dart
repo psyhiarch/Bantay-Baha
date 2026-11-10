@@ -60,9 +60,10 @@ class MapHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class MapView extends StatefulWidget {
-  const MapView({super.key, this.selectedStationId});
+  const MapView({super.key, this.selectedStationId, this.focusRequestId});
 
   final String? selectedStationId;
+  final String? focusRequestId;
 
   @override
   State<MapView> createState() => _MapViewState();
@@ -94,8 +95,8 @@ class _MapViewState extends State<MapView> {
   String? _selectedStationId;
 
   /// The requested station id (from the route) that we've already focused.
-  /// This is what stops the card from re-opening after the user closes it.
-  String? _handledRequestedStationId;
+  /// Stops repeated builds from reopening the card for the same navigation.
+  String? _handledRequestedStationKey;
 
   String? _stationSignature;
   String? _reportSignature;
@@ -136,16 +137,6 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     _loadMapEffectPreference();
-  }
-
-  @override
-  void didUpdateWidget(covariant MapView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // A different station was requested (e.g. the user went back to the
-    // overview and tapped another card). Allow it to be focused again.
-    if (oldWidget.selectedStationId != widget.selectedStationId) {
-      _handledRequestedStationId = null;
-    }
   }
 
   void _onStationFeatureTapped(
@@ -218,17 +209,6 @@ class _MapViewState extends State<MapView> {
                 scrolledUnderElevation: 0,
                 automaticallyImplyLeading: false,
                 actions: [
-                  IconButton(
-                    tooltip: _showHazardRoads
-                        ? 'Hide flood hazard routes'
-                        : 'Show flood hazard routes',
-                    onPressed: () => _setRoadVisibility(!_showHazardRoads),
-                    icon: Icon(
-                      _showHazardRoads
-                          ? Icons.layers_outlined
-                          : Icons.layers_clear_outlined,
-                    ),
-                  ),
                   IconButton(
                     tooltip: 'Plan route',
                     onPressed: _toggleRoutePicker,
@@ -306,7 +286,7 @@ class _MapViewState extends State<MapView> {
                         ),
                       if (showRouteStatus)
                         Positioned(
-                          bottom: 14,
+                          bottom: 76,
                           right: 14,
                           child: Material(
                             color: Theme.of(context).colorScheme.surface
@@ -390,10 +370,14 @@ class _MapViewState extends State<MapView> {
                                       visualDensity: VisualDensity.compact,
                                       onPressed: _routePickStep > 0
                                           ? _cancelRoutePlanning
+                                          : _plannedRoute != null
+                                          ? () => _showRouteDetails(context)
                                           : _toggleRoutePicker,
                                       icon: Icon(
                                         _routePickStep > 0
                                             ? Icons.close_rounded
+                                            : _plannedRoute != null
+                                            ? Icons.directions_outlined
                                             : Icons.open_in_new_rounded,
                                       ),
                                     ),
@@ -426,7 +410,7 @@ class _MapViewState extends State<MapView> {
                         Positioned(
                           left: 14,
                           right: 14,
-                          bottom: showRouteStatus ? 76 : 14,
+                          bottom: showRouteStatus ? 138 : 76,
                           child: _SelectedStationCard(
                             station: selectedStation,
                             onClose: _clearSelection,
@@ -434,6 +418,23 @@ class _MapViewState extends State<MapView> {
                                 _showStationDetails(selectedStation),
                           ),
                         ),
+                      Positioned(
+                        right: 16,
+                        bottom: 14,
+                        child: FloatingActionButton.small(
+                          heroTag: 'toggle-flood-hazard-routes',
+                          tooltip: _showHazardRoads
+                              ? 'Hide flood hazard routes'
+                              : 'Show flood hazard routes',
+                          onPressed: () =>
+                              _setRoadVisibility(!_showHazardRoads),
+                          child: Icon(
+                            _showHazardRoads
+                                ? Icons.route_rounded
+                                : Icons.route_outlined,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

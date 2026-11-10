@@ -1,5 +1,7 @@
 part of 'home_view.dart';
 
+int _stationFocusRequestId = 0;
+
 class _StationCard extends StatelessWidget {
   const _StationCard({required this.station});
   final Station station;
@@ -21,7 +23,11 @@ class _StationCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
-        onTap: () => context.go('/map', extra: station.stationId),
+        onTap: () {
+          final requestId = ++_stationFocusRequestId;
+          final stationId = Uri.encodeQueryComponent(station.stationId);
+          context.go('/map?stationId=$stationId&focus=$requestId');
+        },
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Column(

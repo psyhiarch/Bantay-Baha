@@ -1,4 +1,5 @@
 import 'package:bantay_baha/domain/models/advisory.dart';
+import 'package:bantay_baha/domain/models/location_pin.dart';
 import 'package:bantay_baha/ui/home/home_viewmodel.dart';
 import 'package:bantay_baha/ui/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,8 @@ class AdvisoriesView extends StatefulWidget {
 }
 
 class _AdvisoriesViewState extends State<AdvisoriesView> {
-  String _filter = 'All';
+  String _filter = 'ALL';
+  String _searchQuery = '';
   HomeViewModel? _homeViewModel;
 
   @override
@@ -38,8 +40,8 @@ class _AdvisoriesViewState extends State<AdvisoriesView> {
     return Consumer<HomeViewModel>(
       builder: (context, model, _) {
         final advisories = model.advisories.where((advisory) {
-          return _filter == 'All' ||
-              advisory.severity.toLowerCase().contains(_filter.toLowerCase());
+          return _matchesFilter(advisory, _filter) &&
+              _matchesSearch(advisory, _searchQuery);
         }).toList()..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
         final urgentCount = model.advisories.where(_isUrgent).length;
 
@@ -52,7 +54,7 @@ class _AdvisoriesViewState extends State<AdvisoriesView> {
               slivers: [
                 SliverAppBar(
                   pinned: true,
-                  title: const Text('Advisories'),
+                  title: const Text('Official Advisory Wall'),
                   automaticallyImplyLeading: false,
                   actions: [
                     IconButton(
@@ -108,35 +110,63 @@ class _AdvisoriesViewState extends State<AdvisoriesView> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: SizedBox(
-                      height: 48,
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          for (final filter in const [
-                            'All',
-                            'High',
-                            'Moderate',
-                            'Low',
-                          ]) ...[
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: ChoiceChip(
-                                label: Text(
-                                  filter == 'All' ? 'All updates' : filter,
-                                ),
-                                selected: _filter == filter,
-                                showCheckmark: false,
-                                onSelected: (_) =>
-                                    setState(() => _filter = filter),
-                              ),
-                            ),
-                          ],
-                        ],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                    child: Text(
+                      'Real-time reports from MMDA, NDRRMC, PAGASA, and news outlets.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
                       ),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  sliver: SliverToBoxAdapter(
+                    child: SearchBar(
+                      hintText: 'Search reports, places, or sources',
+                      leading: const Icon(Icons.search_rounded),
+                      trailing: [
+                        if (_searchQuery.isNotEmpty)
+                          IconButton(
+                            tooltip: 'Clear search',
+                            onPressed: () => setState(() => _searchQuery = ''),
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => _searchQuery = value),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 48,
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        for (final filter in const [
+                          'ALL',
+                          'FLOOD',
+                          'WEATHER',
+                          'SUSPENSION',
+                          'MMDA',
+                          'PAGASA',
+                          'NDRRMC',
+                          'NEWS',
+                        ])
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: Text(_filterLabel(filter)),
+                              selected: _filter == filter,
+                              showCheckmark: false,
+                              onSelected: (_) =>
+                                  setState(() => _filter = filter),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -162,11 +192,11 @@ class _AdvisoriesViewState extends State<AdvisoriesView> {
                     child: _AdvisoriesEmpty(
                       icon: Icons.campaign_outlined,
                       title: model.advisories.isEmpty
-                          ? 'No advisories yet'
-                          : 'No matching advisories',
+                          ? 'No reports yet'
+                          : 'No matching reports',
                       message: model.advisories.isEmpty
-                          ? 'Flood and road updates will appear here when reported.'
-                          : 'Try another severity filter to see more updates.',
+                          ? 'Official flood, weather, and suspension reports will appear here when available.'
+                          : 'Try a different filter or search term.',
                     ),
                   )
                 else
@@ -203,6 +233,63 @@ class _AdvisoriesViewState extends State<AdvisoriesView> {
   }
 }
 
+String _filterLabel(String filter) => switch (filter) {
+  'ALL' => 'All reports',
+  'FLOOD' => 'Floods',
+  'WEATHER' => 'Weather',
+  'SUSPENSION' => 'Walang Pasok',
+  'NEWS' => 'News',
+  _ => filter,
+};
+
+bool _matchesFilter(Advisory advisory, String filter) {
+  final source = advisory.source.toUpperCase();
+  final text = advisory.cleanedText.toLowerCase();
+  return switch (filter) {
+    'ALL' => true,
+    'MMDA' || 'NDRRMC' || 'PAGASA' || 'NEWS' => source == filter,
+    'FLOOD' => _isFloodReport(advisory, text),
+    'WEATHER' => RegExp(
+      r'\b(rain|rainfall|thunderstorm|weather|monsoon|typhoon|bagyo|wind|storm)\b',
+    ).hasMatch(text),
+    'SUSPENSION' => RegExp(
+      r'\b(walang\s*pasok|class\s+suspension|suspended|suspension)\b',
+    ).hasMatch(text),
+    _ => true,
+  };
+}
+
+bool _isFloodReport(Advisory advisory, String text) {
+  final passability = advisory.passability.toLowerCase();
+  final depth = advisory.depthCategory.toLowerCase();
+  return advisory.depthInches > 0 ||
+      (depth.isNotEmpty &&
+          !depth.contains('unknown') &&
+          !depth.contains('normal') &&
+          !depth.contains('clear')) ||
+      passability.contains('passable') ||
+      passability.contains('subsided') ||
+      RegExp(r'\b(flood|flooded|flooding|inundat|impassable)\b').hasMatch(text);
+}
+
+bool _matchesSearch(Advisory advisory, String query) {
+  final normalized = query.trim().toLowerCase();
+  if (normalized.isEmpty) return true;
+  final searchable = [
+    advisory.cleanedText,
+    advisory.road,
+    advisory.landmark,
+    advisory.city,
+    advisory.source,
+    advisory.authorName,
+    advisory.authorHandle,
+    ...advisory.locationPins.expand(
+      (pin) => [pin.road, pin.landmark],
+    ),
+  ];
+  return searchable.any((value) => value.toLowerCase().contains(normalized));
+}
+
 String _savedAge(DateTime? date) {
   if (date == null) return 'time unavailable';
   final age = DateTime.now().difference(date);
@@ -216,7 +303,8 @@ bool _isUrgent(Advisory advisory) {
   final severity = advisory.severity.toLowerCase();
   return severity.contains('high') ||
       severity.contains('severe') ||
-      severity.contains('critical');
+      severity.contains('critical') ||
+      severity.contains('alarm');
 }
 
 Color _severityColor(BuildContext context, String severity) {
@@ -228,9 +316,11 @@ Color _severityColor(BuildContext context, String severity) {
   }
   if (value.contains('moderate') ||
       value.contains('warning') ||
-      value.contains('medium')) {
+      value.contains('medium') ||
+      value.contains('alarm')) {
     return AppTheme.warningAmber;
   }
+  if (value.contains('alert')) return AppTheme.warningAmber;
   return AppTheme.success;
 }
 

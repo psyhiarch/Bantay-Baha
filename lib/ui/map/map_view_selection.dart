@@ -12,8 +12,9 @@ extension _MapViewSelectionActions on _MapViewState {
   /// Focuses the station requested through the route, exactly once.
   void _selectRequestedStation(List<Station> stations) {
     final id = widget.selectedStationId;
+    final requestKey = '$id:${widget.focusRequestId ?? ''}';
     if (id == null ||
-        id == _handledRequestedStationId ||
+        requestKey == _handledRequestedStationKey ||
         _controller == null ||
         !_layersReady) {
       return;
@@ -24,7 +25,7 @@ extension _MapViewSelectionActions on _MapViewState {
 
     // Marked synchronously so repeated builds can't queue duplicates, and so
     // closing the card later doesn't bring it back.
-    _handledRequestedStationId = id;
+    _handledRequestedStationKey = requestKey;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _selectStation(id);
     });

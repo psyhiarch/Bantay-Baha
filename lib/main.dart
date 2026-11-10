@@ -33,8 +33,12 @@ GoRouter _createGoRouter() => GoRouter(
           routes: [
             GoRoute(
               path: '/map',
-              builder: (context, state) =>
-                  MapView(selectedStationId: state.extra as String?),
+              builder: (context, state) => MapView(
+                selectedStationId:
+                    state.uri.queryParameters['stationId'] ??
+                    state.extra as String?,
+                focusRequestId: state.uri.queryParameters['focus'],
+              ),
             ),
           ],
         ),
@@ -66,120 +70,38 @@ class _AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(child: navigationShell),
-          SafeArea(
-            top: false,
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                border: Border(
-                  top: BorderSide(color: theme.colorScheme.outlineVariant),
-                ),
-              ),
-              child: SizedBox(
-                height: 64,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _navigationDestination(
-                            context,
-                            index: 0,
-                            label: 'Home',
-                            icon: Icons.home_outlined,
-                            selectedIcon: Icons.home_rounded,
-                          ),
-                        ),
-                        Expanded(
-                          child: _navigationDestination(
-                            context,
-                            index: 1,
-                            label: 'Map',
-                            icon: Icons.map_outlined,
-                            selectedIcon: Icons.map_rounded,
-                          ),
-                        ),
-
-                        Expanded(
-                          child: _navigationDestination(
-                            context,
-                            index: 2,
-                            label: 'Advisories',
-                            icon: Icons.newspaper_outlined,
-                            selectedIcon: Icons.newspaper_rounded,
-                          ),
-                        ),
-
-                        Expanded(
-                          child: _navigationDestination(
-                            context,
-                            index: 3,
-                            label: 'Settings',
-                            icon: Icons.settings_outlined,
-                            selectedIcon: Icons.settings_rounded,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _navigationDestination(
-    BuildContext context, {
-    required int index,
-    required String label,
-    required IconData icon,
-    required IconData selectedIcon,
-  }) {
-    final theme = Theme.of(context);
-    final selected = navigationShell.currentIndex == index;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
+      body: navigationShell,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: (index) {
           navigationShell.goBranch(
             index,
             initialLocation: index == navigationShell.currentIndex,
           );
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              selected ? selectedIcon : icon,
-              size: 21,
-              color: selected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 1),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 10,
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_rounded),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map_rounded),
+            label: 'Map',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.newspaper_outlined),
+            selectedIcon: Icon(Icons.newspaper_rounded),
+            label: 'Advisories',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded),
+            label: 'Settings',
+          ),
+        ],
       ),
     );
   }
